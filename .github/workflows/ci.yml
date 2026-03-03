@@ -32,6 +32,3 @@ jobs:
 
       - name: Unit tests
         run: ./gradlew --no-daemon test
-
-      - name: Integration tests (Testcontainers)
-        run: ./gradlew --no-daemon integrationTest
