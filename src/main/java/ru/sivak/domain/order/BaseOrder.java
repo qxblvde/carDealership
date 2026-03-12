@@ -15,7 +15,15 @@ public abstract class BaseOrder {
     @NonNull
     private final Id managerId;
     @NonNull
-    private final Id clientId;
+    private Id clientId;
     @NonNull
     protected Money price;
+
+    protected void setClientId(@NonNull Id clientId) {
+        this.clientId = clientId;
+    }
+
+    protected void setPrice(@NonNull Money price) {
+        this.price = price;
+    }
 }

@@ -63,4 +63,18 @@ public class CustomOrderService implements ICustomOrderService {
         return customOrderRepository.find(id)
                 .orElseThrow(() -> new IllegalArgumentException("order not found"));
     }
+
+    public OrderDto update(@NonNull Id orderId, @NonNull Id newClientId, @NonNull Id newCarId) {
+        CustomOrder order = get(orderId);
+
+        Car newCar = carRepository.find(newCarId)
+                .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+
+        order.updateClient(newClientId);
+        order.updateCar(newCar);
+
+        customOrderRepository.save(order);
+
+        return OrderMapper.toDto(order);
+    }
 }

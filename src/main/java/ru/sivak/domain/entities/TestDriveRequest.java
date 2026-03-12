@@ -13,9 +13,21 @@ public final class TestDriveRequest {
     @NonNull
     private final Id id;
     @NonNull
-    private final Id clientId;
+    private Id clientId;
     @NonNull
-    private final Id carId;
+    private Id carId;
     @NonNull
-    private final LocalDate scheduledTime;
+    private LocalDate scheduledTime;
+
+    public void updateClient(@NonNull Id newClientId) {
+        this.clientId = newClientId;
+    }
+
+    public void updateCar(@NonNull Id newCarId) {
+        this.carId = newCarId;
+    }
+
+    public void updateScheduledTime(@NonNull LocalDate newTime) {
+        this.scheduledTime = newTime;
+    }
 }

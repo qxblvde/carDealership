@@ -14,34 +14,39 @@ import java.util.Map;
 @Getter
 @RequiredArgsConstructor
 public final class CarConfigurator {
+
     @NonNull
     private final Car car;
+
     private final Map<ComponentType, Component> components = new HashMap<>();
 
-    public void addComponent(@NonNull ComponentType componentType, @NonNull Component component) {
-        if (!component.isSuitableWith(car.getModelName())) {
+    public void addComponent(@NonNull Component component) {
+
+        if (!component.isSuitableWith(car.getModel().getModelName())) {
             throw new IncompatibleComponentException(
-                    componentType,
-                    component.getName(),
-                    car.getModelName()
+                    component.getComponentType(),
+                    component.getComponentName(),
+                    car.getModel().getModelName()
             );
         }
-        components.put(componentType, component);
+
+        components.put(component.getComponentType(), component);
     }
 
     public void validate() {
-        for (ComponentType componentType : car.getRequiredComponentTypes()) {
-            if (!components.containsKey(componentType)) {
-                throw DomainValidationException.missingNode(componentType.getName());
+        for (ComponentType requiredType : car.getRequiredComponentTypes()) {
+            if (!components.containsKey(requiredType)) {
+                throw DomainValidationException.missingNode(requiredType.getName());
             }
         }
+
     }
 
     public Money calculatePrice() {
-        Money total = car.getPrice();
-        for (Component component : components.values()) {
-            total = total.add(component.getPrice());
-        }
-        return total;
+        return components.values()
+                .stream()
+                .map(Component::getPrice)
+                .reduce(car.getPrice(), Money::add);
+
     }
 }

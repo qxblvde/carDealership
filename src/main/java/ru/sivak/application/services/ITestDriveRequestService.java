@@ -12,4 +12,5 @@ public interface ITestDriveRequestService {
     List<TestDriveRequestDto> query(TestDriveRequestQuery query);
     void delete(Id id);
     TestDriveRequestDto get(Id id);
+    TestDriveRequestDto update(Id requestId, Id newClientId, Id newCarId, LocalDate newTime);
 }

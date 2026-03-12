@@ -6,7 +6,7 @@ public record CarDto(
         Id id,
         BodyType bodyType,
         BrandName brandName,
-        Color color,
+        ColorValue color,
         DriveType driveType,
         EnginePower enginePower,
         EngineVolume engineVolume,

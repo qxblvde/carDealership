@@ -35,21 +35,21 @@ public class InMemoryCarRepository implements CarRepository {
     public List<Car> query(CarQuery query) {
         return storage.values().stream()
                 .filter(car -> query.getBrandName() == null ||
-                        car.getBrandName().equals(query.getBrandName()))
+                        car.getBrandName().getName().equals(query.getBrandName()))
                 .filter(car -> query.getModelName() == null ||
-                        car.getModelName().equals(query.getModelName()))
+                        car.getModel().getModelName().equals(query.getModelName()))
                 .filter(car -> query.getBodyType() == null ||
-                        car.getBodyType().equals(query.getBodyType()))
+                        car.getBodyType().getBodyType().equals(query.getBodyType()))
                 .filter(car -> query.getColor() == null ||
-                        car.getColor().equals(query.getColor()))
+                        car.getColor().getColor().equals(query.getColor()))
                 .filter(car -> query.getDriveType() == null ||
-                        car.getDriveType().equals(query.getDriveType()))
+                        car.getDriveType().getDriveType().equals(query.getDriveType()))
                 .filter(car -> query.getEnginePower() == null ||
-                        car.getEnginePower().equals(query.getEnginePower()))
+                        car.getEngine().getPower().equals(query.getEnginePower()))
                 .filter(car -> query.getEngineVolume() == null ||
-                        car.getEngineVolume().equals(query.getEngineVolume()))
+                        car.getEngine().getVolume().equals(query.getEngineVolume()))
                 .filter(car -> query.getFuelType() == null ||
-                        car.getFuelType().equals(query.getFuelType()))
+                        car.getFuel().getFuelType().equals(query.getFuelType()))
                 .filter(car -> query.getMinPrice() == null ||
                         car.getPrice().getAmount()
                                 .compareTo(query.getMinPrice().getAmount()) >= 0)

@@ -60,4 +60,19 @@ public class InStockOrderService implements IInStockOrderService {
         return inStockOrderRepository.find(id)
                 .orElseThrow(() -> new IllegalArgumentException("order not found"));
     }
+
+    public OrderDto update(@NonNull Id orderId, @NonNull Id newClientId, @NonNull Id newCarId) {
+        InStockOrder order = get(orderId);
+
+        Car newCar = carRepository.find(newCarId)
+                .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+
+        order.updateClient(newClientId);
+        order.updateCar(newCar);
+
+        inStockOrderRepository.save(order);
+
+        return OrderMapper.toDto(order);
+    }
 }
+

@@ -18,4 +18,5 @@ public interface IInStockOrderService {
     void markAsReady(Id orderId);
 
     InStockOrder get(Id id);
+    OrderDto update(Id orderId, Id newClientId, Id newCarId);
 }

@@ -19,4 +19,5 @@ public interface ICustomOrderService {
     void markAsReady(Id orderId);
 
     CustomOrder get(Id id);
+    OrderDto update(Id orderId, Id newClientId, Id newCarId);
 }

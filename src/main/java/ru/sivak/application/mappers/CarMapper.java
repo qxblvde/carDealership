@@ -9,16 +9,16 @@ public final class CarMapper {
     public static CarDto toDto(Car car) {
         return new CarDto(
                 car.getId(),
-                car.getBodyType(),
-                car.getBrandName(),
-                car.getColor(),
-                car.getDriveType(),
-                car.getEnginePower(),
-                car.getEngineVolume(),
-                car.getFuelType(),
-                car.getModelName(),
+                car.getBodyType().getBodyType(),
+                car.getBrandName().getName(),
+                car.getColor().getColor(),
+                car.getDriveType().getDriveType(),
+                car.getEngine().getPower(),
+                car.getEngine().getVolume(),
+                car.getFuel().getFuelType(),
+                car.getModel().getModelName(),
                 car.getPrice(),
-                car.getTransmissionType()
+                car.getTransmission().getTransmissionType()
         );
     }
 }

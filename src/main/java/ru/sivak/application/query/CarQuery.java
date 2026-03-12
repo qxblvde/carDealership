@@ -10,7 +10,7 @@ public class CarQuery {
     private final BrandName brandName;
     private final ModelName modelName;
     private final BodyType bodyType;
-    private final Color color;
+    private final ColorValue color;
     private final DriveType driveType;
     private final EnginePower enginePower;
     private final EngineVolume engineVolume;

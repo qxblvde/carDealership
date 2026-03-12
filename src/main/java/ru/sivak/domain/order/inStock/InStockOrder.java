@@ -44,4 +44,11 @@ public class InStockOrder extends BaseOrder {
     public Class<? extends InStockOrderState> getStateType() {
         return state.getClass();
     }
+    public void updateClient(@NonNull Id newClientId) {
+        setClientId(newClientId);
+    }
+
+    public void updateCar(@NonNull Car newCar) {
+        setPrice(newCar.getPrice());
+    }
 }

@@ -44,4 +44,13 @@ public class CustomOrder extends BaseOrder {
     public Class<? extends CustomOrderState> getStateType() {
         return state.getClass();
     }
+
+    public void updateClient(@NonNull Id newClientId) {
+        setClientId(newClientId);
+    }
+
+    public void updateCar(@NonNull Car newCar) {
+        setPrice(newCar.getPrice());
+
+    }
 }

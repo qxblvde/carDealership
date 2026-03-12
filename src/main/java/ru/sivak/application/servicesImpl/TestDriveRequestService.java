@@ -45,4 +45,17 @@ public class TestDriveRequestService implements ITestDriveRequestService {
                 .map(TestDriveMapper::toDto)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found"));
     }
+
+    public TestDriveRequestDto update(@NonNull Id requestId, @NonNull Id newClientId, @NonNull Id newCarId, @NonNull LocalDate newTime) {
+        TestDriveRequest request = repository.find(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+
+        request.updateClient(newClientId);
+        request.updateCar(newCarId);
+        request.updateScheduledTime(newTime);
+
+        repository.save(request);
+
+        return TestDriveMapper.toDto(request);
+    }
 }
