@@ -98,8 +98,8 @@ class ApplicationOrderServicesTest {
 
         //Assert
         assertEquals(1, result.size());
-        assertEquals(clientId, result.getFirst().clientId());
-        assertEquals(CreatedState.class, result.getFirst().stateType());
+        assertEquals(clientId, result.get(0).clientId());
+        assertEquals(CreatedState.class, result.get(0).stateType());
     }
 
     @Test
@@ -232,8 +232,8 @@ class ApplicationOrderServicesTest {
         );
         //Assert
         assertEquals(1, result.size());
-        assertEquals(clientId, result.getFirst().clientId());
-        assertEquals(WaitingPaymentState.class, result.getFirst().stateType());
+        assertEquals(clientId, result.get(0).clientId());
+        assertEquals(WaitingPaymentState.class, result.get(0).stateType());
     }
 
     @Test
