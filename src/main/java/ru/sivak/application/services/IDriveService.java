@@ -8,7 +8,9 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 public interface IDriveService {
-    DriveDto save(Drive drive);
+    DriveDto create(Drive drive);
+
+    DriveDto update(Drive drive);
 
     void delete(Id id);
 

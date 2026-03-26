@@ -2,6 +2,7 @@ package ru.sivak.application.servicesImpl;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.sivak.application.dto.WheelDto;
 import ru.sivak.application.mappers.WheelMapper;
 import ru.sivak.application.query.WheelQuery;
@@ -12,15 +13,25 @@ import ru.sivak.domain.valueObjects.Id;
 
 import java.util.List;
 @RequiredArgsConstructor
+@Service
 public class WheelService implements IWheelService {
 
     @NonNull
     private final WheelRepository wheelRepository;
 
+    @NonNull
+    private final WheelMapper wheelMapper;
+
     @Override
-    public WheelDto save(Wheel wheel) {
-        wheelRepository.save(wheel);
-        return WheelMapper.toDto(wheel);
+    public WheelDto create(Wheel wheel) {
+        wheelRepository.create(wheel);
+        return wheelMapper.map(wheel);
+    }
+
+    
+    public WheelDto update(Wheel wheel) {
+        wheelRepository.update(wheel);
+        return wheelMapper.map(wheel);
     }
 
     @Override
@@ -32,7 +43,7 @@ public class WheelService implements IWheelService {
     public List<WheelDto> findAll() {
         return wheelRepository.findAll()
                 .stream()
-                .map(WheelMapper::toDto)
+                .map(wheelMapper::map)
                 .toList();
     }
 
@@ -40,14 +51,14 @@ public class WheelService implements IWheelService {
     public List<WheelDto> query(WheelQuery query) {
         return wheelRepository.query(query)
                 .stream()
-                .map(WheelMapper::toDto)
+                .map(wheelMapper::map)
                 .toList();
     }
 
     @Override
     public WheelDto get(Id id) {
         return wheelRepository.find(id)
-                .map(WheelMapper::toDto)
+                .map(wheelMapper::map)
                 .orElseThrow(() -> new IllegalArgumentException("Transmission not found"));
     }
 }

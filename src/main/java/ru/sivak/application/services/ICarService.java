@@ -8,7 +8,9 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 public interface ICarService {
-     CarDto save(Car car);
+     CarDto create(Car car);
+
+     CarDto update(Car car);
 
      void delete(Id id);
 

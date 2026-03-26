@@ -2,6 +2,7 @@ package ru.sivak.application.servicesImpl;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.sivak.application.dto.SteeringDto;
 import ru.sivak.application.mappers.SteeringMapper;
 import ru.sivak.application.query.SteeringQuery;
@@ -13,15 +14,25 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class SteeringService implements ISteeringService {
 
     @NonNull
     private final SteeringRepository steeringRepository;
 
+    @NonNull
+    private final SteeringMapper steeringMapper;
+
     @Override
-    public SteeringDto save(Steering steering) {
-        steeringRepository.save(steering);
-        return SteeringMapper.toDto(steering);
+    public SteeringDto create(Steering steering) {
+        steeringRepository.create(steering);
+        return steeringMapper.map(steering);
+    }
+
+    
+    public SteeringDto update(Steering steering) {
+        steeringRepository.update(steering);
+        return steeringMapper.map(steering);
     }
 
     @Override
@@ -33,7 +44,7 @@ public class SteeringService implements ISteeringService {
     public List<SteeringDto> findAll() {
         return steeringRepository.findAll()
                 .stream()
-                .map(SteeringMapper::toDto)
+                .map(steeringMapper::map)
                 .toList();
     }
 
@@ -41,14 +52,14 @@ public class SteeringService implements ISteeringService {
     public List<SteeringDto> query(SteeringQuery query) {
         return steeringRepository.query(query)
                 .stream()
-                .map(SteeringMapper::toDto)
+                .map(steeringMapper::map)
                 .toList();
     }
 
     @Override
     public SteeringDto get(Id id) {
         return steeringRepository.find(id)
-                .map(SteeringMapper::toDto)
+                .map(steeringMapper::map)
                 .orElseThrow(() -> new RuntimeException("Steering not found"));
     }
 }

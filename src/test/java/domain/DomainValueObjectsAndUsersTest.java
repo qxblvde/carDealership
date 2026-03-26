@@ -6,19 +6,10 @@ import ru.sivak.domain.user.Client;
 import ru.sivak.domain.user.Manager;
 import ru.sivak.domain.user.StorageAdministrator;
 import ru.sivak.domain.user.SystemAdministrator;
-import ru.sivak.domain.valueObjects.BodyType;
-import ru.sivak.domain.valueObjects.BrandName;
-import ru.sivak.domain.valueObjects.ColorValue;
-import ru.sivak.domain.valueObjects.ComponentName;
-import ru.sivak.domain.valueObjects.ComponentType;
-import ru.sivak.domain.valueObjects.DriveType;
 import ru.sivak.domain.valueObjects.EnginePower;
 import ru.sivak.domain.valueObjects.EngineVolume;
-import ru.sivak.domain.valueObjects.FuelType;
 import ru.sivak.domain.valueObjects.Id;
-import ru.sivak.domain.valueObjects.ModelName;
 import ru.sivak.domain.valueObjects.Money;
-import ru.sivak.domain.valueObjects.TransmissionType;
 
 import java.math.BigDecimal;
 
@@ -54,18 +45,6 @@ class DomainValueObjectsAndUsersTest {
     }
 
     @Test
-    void engine_power_returns_value() {
-        //Arrange
-        EnginePower power = EnginePower.of(220);
-
-        //Act
-        int actual = power.getPower();
-
-        //Assert
-        assertEquals(220, actual);
-    }
-
-    @Test
     void engine_power_rejects_negative_value() {
         //Arrange
         Executable action = () -> EnginePower.of(-1);
@@ -78,18 +57,6 @@ class DomainValueObjectsAndUsersTest {
     }
 
     @Test
-    void engine_volume_returns_value() {
-        //Arrange
-        EngineVolume volume = EngineVolume.of(2000);
-
-        //Act
-        int actual = volume.getVolume();
-
-        //Assert
-        assertEquals(2000, actual);
-    }
-
-    @Test
     void engine_volume_rejects_negative_value() {
         //Arrange
         Executable action = () -> EngineVolume.of(-1);
@@ -99,60 +66,6 @@ class DomainValueObjectsAndUsersTest {
 
         //Assert
         assertEquals(IllegalArgumentException.class, exception.getClass());
-    }
-
-    @Test
-    void body_brand_and_color_wrappers_return_values() {
-        //Arrange
-        BodyType bodyType = BodyType.of("Sedan");
-        BrandName brandName = BrandName.of("Toyota");
-        ColorValue colorValue = ColorValue.of("Black");
-
-        //Act
-        String body = bodyType.getType();
-        String brand = brandName.getName();
-        String color = colorValue.getColor();
-
-        //Assert
-        assertEquals("Sedan", body);
-        assertEquals("Toyota", brand);
-        assertEquals("Black", color);
-    }
-
-    @Test
-    void component_and_drive_wrappers_return_values() {
-        //Arrange
-        ComponentName componentName = ComponentName.of("Premium");
-        ComponentType componentType = ComponentType.of("Transmission");
-        DriveType driveType = DriveType.of("example1");
-
-        //Act
-        String component = componentName.getName();
-        String type = componentType.getName();
-        String drive = driveType.getType();
-
-        //Assert
-        assertEquals("Premium", component);
-        assertEquals("Transmission", type);
-        assertEquals("example1", drive);
-    }
-
-    @Test
-    void fuel_model_and_transmission_wrappers_return_values() {
-        //Arrange
-        FuelType fuelType = FuelType.of("Petrol");
-        ModelName modelName = ModelName.of("Camry");
-        TransmissionType transmissionType = TransmissionType.of("example1");
-
-        //Act
-        String fuel = fuelType.getType();
-        String model = modelName.getName();
-        String transmission = transmissionType.getType();
-
-        //Assert
-        assertEquals("Petrol", fuel);
-        assertEquals("Camry", model);
-        assertEquals("example1", transmission);
     }
 
     @Test

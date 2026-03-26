@@ -6,8 +6,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface Repository<T> {
-    void save(T entity);
+    void create(T entity);
+
+    void update(T entity);
+
     void delete(Id id);
+
     Optional<T> find(Id id);
 
     List<T> findAll();

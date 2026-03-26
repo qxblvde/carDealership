@@ -8,7 +8,9 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 public interface IColorService {
-    ColorDto save(Color color);
+    ColorDto create(Color color);
+
+    ColorDto update(Color color);
 
     void delete(Id id);
 

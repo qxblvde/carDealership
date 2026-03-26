@@ -8,7 +8,9 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 public interface IEngineService {
-    EngineDto save(Engine engine);
+    EngineDto create(Engine engine);
+
+    EngineDto update(Engine engine);
 
     void delete(Id id);
 

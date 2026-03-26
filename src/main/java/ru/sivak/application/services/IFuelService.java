@@ -8,7 +8,9 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 public interface IFuelService {
-    FuelDto save(Fuel fuel);
+    FuelDto create(Fuel fuel);
+
+    FuelDto update(Fuel fuel);
 
     void delete(Id id);
 

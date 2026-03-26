@@ -1,24 +1,20 @@
 package ru.sivak.application.mappers;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.sivak.application.dto.CarDto;
 import ru.sivak.domain.entities.Car;
 
-public final class CarMapper {
-    private CarMapper() {}
-
-    public static CarDto toDto(Car car) {
-        return new CarDto(
-                car.getId(),
-                car.getBodyType().getBodyType(),
-                car.getBrandName().getName(),
-                car.getColor().getColor(),
-                car.getDriveType().getDriveType(),
-                car.getEngine().getPower(),
-                car.getEngine().getVolume(),
-                car.getFuel().getFuelType(),
-                car.getModel().getModelName(),
-                car.getPrice(),
-                car.getTransmission().getTransmissionType()
-        );
-    }
+@Mapper(componentModel = "spring")
+public interface CarMapper {
+    @Mapping(target = "bodyType", source = "bodyType.bodyType")
+    @Mapping(target = "brandName", source = "brandName.name")
+    @Mapping(target = "color", source = "color.color")
+    @Mapping(target = "driveType", source = "driveType.driveType")
+    @Mapping(target = "enginePower", source = "engine.power")
+    @Mapping(target = "engineVolume", source = "engine.volume")
+    @Mapping(target = "fuelType", source = "fuel.fuelType")
+    @Mapping(target = "modelName", source = "model.modelName")
+    @Mapping(target = "transmissionType", source = "transmission.transmissionType")
+    CarDto map(Car car);
 }

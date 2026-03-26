@@ -8,7 +8,9 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 public interface IModelService {
-    ModelDto save(Model model);
+    ModelDto create(Model model);
+
+    ModelDto update(Model model);
 
     void delete(Id id);
 

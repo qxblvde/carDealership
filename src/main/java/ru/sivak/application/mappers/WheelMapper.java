@@ -1,16 +1,11 @@
 package ru.sivak.application.mappers;
 
+import org.mapstruct.Mapper;
 import ru.sivak.application.dto.WheelDto;
 import ru.sivak.domain.entities.Wheel;
 
-public class WheelMapper {
-    private WheelMapper() {}
+@Mapper(componentModel = "spring")
+public interface WheelMapper {
 
-    public static WheelDto toDto(Wheel wheel) {
-        return new WheelDto(
-                wheel.getPrice(),
-                wheel.getComponentName(),
-                wheel.getSuitableModels()
-        );
-    }
+    WheelDto map(Wheel wheel);
 }

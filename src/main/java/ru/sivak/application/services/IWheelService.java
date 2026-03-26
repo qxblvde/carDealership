@@ -8,7 +8,9 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 public interface IWheelService {
-    WheelDto save(Wheel wheel);
+    WheelDto create(Wheel wheel);
+
+    WheelDto update(Wheel wheel);
 
     void delete(Id id);
 

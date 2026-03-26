@@ -8,7 +8,9 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 public interface ITransmissionService {
-    TransmissonDto save(Transmission transmission);
+    TransmissonDto create(Transmission transmission);
+
+    TransmissonDto update(Transmission transmission);
 
     void delete(Id id);
 

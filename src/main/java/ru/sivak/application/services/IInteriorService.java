@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface IInteriorService {
 
-    InteriorDto save(Interior interior);
+    InteriorDto create(Interior interior);
+
+    InteriorDto update(Interior interior);
 
     void delete(Id id);
 
