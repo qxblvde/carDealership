@@ -1,16 +1,11 @@
 package ru.sivak.application.mappers;
 
+import org.mapstruct.Mapper;
 import ru.sivak.application.dto.ModelDto;
 import ru.sivak.domain.entities.Model;
 
-public class ModelMapper {
-    private ModelMapper() {}
+@Mapper(componentModel = "spring")
+public interface ModelMapper {
 
-    public static ModelDto toDto(Model model) {
-        return new ModelDto(
-                model.getModelName(),
-                model.getPrice(),
-                model.getComponentName()
-        );
-    }
+    ModelDto map(Model model);
 }

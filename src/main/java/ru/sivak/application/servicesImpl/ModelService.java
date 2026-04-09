@@ -2,6 +2,7 @@ package ru.sivak.application.servicesImpl;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.sivak.application.dto.ModelDto;
 import ru.sivak.application.mappers.ModelMapper;
 import ru.sivak.application.query.ModelQuery;
@@ -13,14 +14,24 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class ModelService implements IModelService {
     @NonNull
     private final ModelRepository modelRepository;
 
+    @NonNull
+    private final ModelMapper modelMapper;
+
     @Override
-    public ModelDto save(Model model) {
-        modelRepository.save(model);
-        return ModelMapper.toDto(model);
+    public ModelDto create(Model model) {
+        modelRepository.create(model);
+        return modelMapper.map(model);
+    }
+
+    
+    public ModelDto update(Model model) {
+        modelRepository.update(model);
+        return modelMapper.map(model);
     }
 
     @Override
@@ -32,7 +43,7 @@ public class ModelService implements IModelService {
     public List<ModelDto> findAll() {
         return modelRepository.findAll()
                 .stream()
-                .map(ModelMapper::toDto)
+                .map(modelMapper::map)
                 .toList();
     }
 
@@ -40,14 +51,14 @@ public class ModelService implements IModelService {
     public List<ModelDto> query(ModelQuery query) {
         return modelRepository.query(query)
                 .stream()
-                .map(ModelMapper::toDto)
+                .map(modelMapper::map)
                 .toList();
     }
 
     @Override
     public ModelDto get(Id id) {
         return modelRepository.find(id)
-                .map(ModelMapper::toDto)
+                .map(modelMapper::map)
                 .orElseThrow(() -> new IllegalArgumentException("Model not found"));
     }
 }

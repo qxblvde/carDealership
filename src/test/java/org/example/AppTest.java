@@ -8,6 +8,9 @@ class AppTest {
 
     @Test
     void shouldComputeSum() {
+        //Arrange
+        //Act
+        //Assert
         int result = 2 + 2;
         assertEquals(4, result);
     }

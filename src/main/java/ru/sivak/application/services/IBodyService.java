@@ -8,7 +8,9 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 public interface IBodyService {
-    BodyDto save(Body body);
+    BodyDto create(Body body);
+
+    BodyDto update(Body body);
 
     void delete(Id id);
 

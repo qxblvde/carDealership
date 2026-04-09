@@ -15,6 +15,10 @@ public final class Id {
         this.id = id;
     }
 
+    public static Id of(@NonNull UUID id) {
+        return new Id(id);
+    }
+
     public static Id newId() {
         return new Id(UUID.randomUUID());
     }

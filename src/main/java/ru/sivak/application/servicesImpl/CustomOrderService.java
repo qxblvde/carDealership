@@ -2,6 +2,7 @@ package ru.sivak.application.servicesImpl;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.sivak.application.dto.OrderDto;
 import ru.sivak.application.mappers.OrderMapper;
 import ru.sivak.application.query.CustomOrderQuery;
@@ -15,53 +16,89 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class CustomOrderService implements ICustomOrderService {
     @NonNull
     private final CustomOrderRepository customOrderRepository;
     @NonNull
     private final CarRepository carRepository;
 
-    public OrderDto create(@NonNull Id clientId, @NonNull Id carId) {
+    @NonNull
+    private final OrderMapper orderMapper;
+
+    public OrderDto create(@NonNull Id managerId, @NonNull Id clientId, @NonNull Id carId) {
         Car car = carRepository.find(carId)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
-        CustomOrder order = new CustomOrder(Id.newId(), Id.newId(), clientId, car);
-        customOrderRepository.save(order);
-        return OrderMapper.toDto(order);
+        CustomOrder order = new CustomOrder(Id.newId(), managerId, clientId, car);
+        customOrderRepository.create(order);
+        return orderMapper.map(order);
     }
 
     public List<OrderDto> query(@NonNull CustomOrderQuery query) {
         return customOrderRepository.query(query)
                 .stream()
-                .map(OrderMapper::toDto)
+                .map(orderMapper::map)
                 .toList();
 
     }
 
     public void approve(@NonNull Id orderId) {
-        get(orderId).approve();
+        CustomOrder order = get(orderId);
+        if (!order.approve()) {
+            throw new IllegalArgumentException("Invalid custom order transition");
+        }
+        customOrderRepository.update(order);
     }
     public void requestPayment(@NonNull Id orderId) {
-        get(orderId).requestPayment();
+        CustomOrder order = get(orderId);
+        if (!order.requestPayment()) {
+            throw new IllegalArgumentException("Invalid custom order transition");
+        }
+        customOrderRepository.update(order);
     }
     public void pay(@NonNull Id orderId) {
-        get(orderId).pay();
+        CustomOrder order = get(orderId);
+        if (!order.pay()) {
+            throw new IllegalArgumentException("Invalid custom order transition");
+        }
+        customOrderRepository.update(order);
     }
     public void requestDelivery(@NonNull Id orderId) {
-        get(orderId).requestDelivery();
+        CustomOrder order = get(orderId);
+        if (!order.requestDelivery()) {
+            throw new IllegalArgumentException("Invalid custom order transition");
+        }
+        customOrderRepository.update(order);
     }
     public void complete(@NonNull Id orderId) {
-        get(orderId).complete();
+        CustomOrder order = get(orderId);
+        if (!order.complete()) {
+            throw new IllegalArgumentException("Invalid custom order transition");
+        }
+        customOrderRepository.update(order);
     }
     public void cancel(@NonNull Id orderId) {
-        get(orderId).cancel();
+        CustomOrder order = get(orderId);
+        if (!order.cancel()) {
+            throw new IllegalArgumentException("Invalid custom order transition");
+        }
+        customOrderRepository.update(order);
     }
     public void markAsReady(@NonNull Id orderId) {
-        get(orderId).markAsReady();
+        CustomOrder order = get(orderId);
+        if (!order.markAsReady()) {
+            throw new IllegalArgumentException("Invalid custom order transition");
+        }
+        customOrderRepository.update(order);
     }
 
     public CustomOrder get(@NonNull Id id) {
         return customOrderRepository.find(id)
                 .orElseThrow(() -> new IllegalArgumentException("order not found"));
+    }
+
+    public OrderDto getDto(@NonNull Id id) {
+        return orderMapper.map(get(id));
     }
 
     public OrderDto update(@NonNull Id orderId, @NonNull Id newClientId, @NonNull Id newCarId) {
@@ -73,8 +110,9 @@ public class CustomOrderService implements ICustomOrderService {
         order.updateClient(newClientId);
         order.updateCar(newCar);
 
-        customOrderRepository.save(order);
+        customOrderRepository.update(order);
 
-        return OrderMapper.toDto(order);
+        return orderMapper.map(order);
     }
+
 }

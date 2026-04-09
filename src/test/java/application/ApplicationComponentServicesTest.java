@@ -1,85 +1,38 @@
 package application;
 
 import org.junit.jupiter.api.Test;
-import ru.sivak.application.query.BodyQuery;
-import ru.sivak.application.query.BrandQuery;
-import ru.sivak.application.query.CarQuery;
-import ru.sivak.application.query.ColorQuery;
-import ru.sivak.application.query.DriveQuery;
-import ru.sivak.application.query.EngineQuery;
-import ru.sivak.application.query.FuelQuery;
-import ru.sivak.application.query.InteriorQuery;
-import ru.sivak.application.query.ModelQuery;
-import ru.sivak.application.query.SteeringQuery;
-import ru.sivak.application.query.TransmissionQuery;
-import ru.sivak.application.query.WheelQuery;
-import ru.sivak.application.servicesImpl.BodyService;
-import ru.sivak.application.servicesImpl.BrandService;
-import ru.sivak.application.servicesImpl.CarService;
-import ru.sivak.application.servicesImpl.ColorService;
-import ru.sivak.application.servicesImpl.DriveService;
-import ru.sivak.application.servicesImpl.EngineService;
-import ru.sivak.application.servicesImpl.FuelService;
-import ru.sivak.application.servicesImpl.InteriorService;
-import ru.sivak.application.servicesImpl.ModelService;
-import ru.sivak.application.servicesImpl.SteeringService;
-import ru.sivak.application.servicesImpl.TransmissionService;
-import ru.sivak.application.servicesImpl.WheelService;
-import ru.sivak.domain.entities.Body;
-import ru.sivak.domain.entities.Brand;
-import ru.sivak.domain.entities.Car;
-import ru.sivak.domain.entities.Color;
-import ru.sivak.domain.entities.Drive;
-import ru.sivak.domain.entities.Engine;
-import ru.sivak.domain.entities.Fuel;
-import ru.sivak.domain.entities.Interior;
-import ru.sivak.domain.entities.Model;
-import ru.sivak.domain.entities.Steering;
-import ru.sivak.domain.entities.Transmission;
-import ru.sivak.domain.entities.Wheel;
-import ru.sivak.domain.valueObjects.BodyType;
-import ru.sivak.domain.valueObjects.BrandName;
-import ru.sivak.domain.valueObjects.ColorValue;
-import ru.sivak.domain.valueObjects.ComponentName;
-import ru.sivak.domain.valueObjects.DriveType;
-import ru.sivak.domain.valueObjects.EnginePower;
-import ru.sivak.domain.valueObjects.EngineVolume;
-import ru.sivak.domain.valueObjects.FuelType;
-import ru.sivak.domain.valueObjects.Id;
-import ru.sivak.domain.valueObjects.ModelName;
-import ru.sivak.domain.valueObjects.Money;
-import ru.sivak.domain.valueObjects.TransmissionType;
-import ru.sivak.infrastructure.repositories.InMemoryBodyRepository;
-import ru.sivak.infrastructure.repositories.InMemoryBrandRepository;
-import ru.sivak.infrastructure.repositories.InMemoryCarRepository;
-import ru.sivak.infrastructure.repositories.InMemoryColorRepository;
-import ru.sivak.infrastructure.repositories.InMemoryDriveRepository;
-import ru.sivak.infrastructure.repositories.InMemoryEngineRepository;
-import ru.sivak.infrastructure.repositories.InMemoryFuelRepository;
-import ru.sivak.infrastructure.repositories.InMemoryInteriorRepository;
-import ru.sivak.infrastructure.repositories.InMemoryModelRepository;
-import ru.sivak.infrastructure.repositories.InMemorySteeringRepository;
-import ru.sivak.infrastructure.repositories.InMemoryTransmissonRepository;
-import ru.sivak.infrastructure.repositories.InMemoryWheelRepository;
+import ru.sivak.application.mappers.*;
+import ru.sivak.application.query.*;
+import ru.sivak.application.servicesImpl.*;
+import ru.sivak.domain.entities.*;
+import ru.sivak.domain.repositories.*;
+import ru.sivak.domain.valueObjects.*;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class ApplicationComponentServicesTest {
 
     @Test
-    void body_service_saves_queries_and_deletes_body() {
+    void body_service_creates_updates_queries_and_deletes_body() {
         //Arrange
-        BodyService service = new BodyService(new InMemoryBodyRepository());
+        BodyRepository repository = mock(BodyRepository.class);
+        BodyService service = new BodyService(repository, new BodyMapperImpl());
         Body body = body("Sedan", "1000", models());
-        Body secondBody = body("SUV", "2000", corollaModels());
+
+        when(repository.find(body.getId())).thenReturn(Optional.of(body), Optional.empty());
+        when(repository.query(any(BodyQuery.class))).thenReturn(List.of(body));
 
         //Act
-        service.save(body);
-        service.save(secondBody);
+        service.create(body);
+        service.update(body);
         BodyType actualType = service.get(body.getId()).type();
         int querySize = service.query(BodyQuery.builder().modelName(ModelName.of("Camry")).maxPrice(money("1200")).build()).size();
         service.delete(body.getId());
@@ -88,18 +41,24 @@ class ApplicationComponentServicesTest {
         assertEquals(BodyType.of("Sedan"), actualType);
         assertEquals(1, querySize);
         assertThrows(IllegalArgumentException.class, () -> service.get(body.getId()));
+        verify(repository).create(body);
+        verify(repository).update(body);
+        verify(repository).delete(body.getId());
     }
 
     @Test
-    void brand_service_saves_queries_and_deletes_brand() {
+    void brand_service_creates_updates_queries_and_deletes_brand() {
         //Arrange
-        BrandService service = new BrandService(new InMemoryBrandRepository());
+        BrandRepository repository = mock(BrandRepository.class);
+        BrandService service = new BrandService(repository, new BrandMapperImpl());
         Brand brand = brand("Toyota", "1500", models());
-        Brand secondBrand = brand("Honda", "2500", corollaModels());
+
+        when(repository.find(brand.getId())).thenReturn(Optional.of(brand), Optional.empty());
+        when(repository.query(any(BrandQuery.class))).thenReturn(List.of(brand));
 
         //Act
-        service.save(brand);
-        service.save(secondBrand);
+        service.create(brand);
+        service.update(brand);
         BrandName actualName = service.get(brand.getId()).brandName();
         int querySize = service.query(BrandQuery.builder().modelName(ModelName.of("Camry")).maxPrice(money("2000")).build()).size();
         service.delete(brand.getId());
@@ -108,18 +67,24 @@ class ApplicationComponentServicesTest {
         assertEquals(BrandName.of("Toyota"), actualName);
         assertEquals(1, querySize);
         assertThrows(IllegalArgumentException.class, () -> service.get(brand.getId()));
+        verify(repository).create(brand);
+        verify(repository).update(brand);
+        verify(repository).delete(brand.getId());
     }
 
     @Test
-    void color_service_saves_queries_and_deletes_color() {
+    void color_service_creates_updates_queries_and_deletes_color() {
         //Arrange
-        ColorService service = new ColorService(new InMemoryColorRepository());
+        ColorRepository repository = mock(ColorRepository.class);
+        ColorService service = new ColorService(repository, new ColorMapperImpl());
         Color color = color("Black", "300", models());
-        Color secondColor = color("White", "600", corollaModels());
+
+        when(repository.find(color.getId())).thenReturn(Optional.of(color), Optional.empty());
+        when(repository.query(any(ColorQuery.class))).thenReturn(List.of(color));
 
         //Act
-        service.save(color);
-        service.save(secondColor);
+        service.create(color);
+        service.update(color);
         ColorValue actualColor = service.get(color.getId()).color();
         int querySize = service.query(ColorQuery.builder().color(ColorValue.of("Black")).modelName(ModelName.of("Camry")).build()).size();
         service.delete(color.getId());
@@ -128,38 +93,50 @@ class ApplicationComponentServicesTest {
         assertEquals(ColorValue.of("Black"), actualColor);
         assertEquals(1, querySize);
         assertThrows(IllegalArgumentException.class, () -> service.get(color.getId()));
+        verify(repository).create(color);
+        verify(repository).update(color);
+        verify(repository).delete(color.getId());
     }
 
     @Test
-    void drive_service_saves_queries_and_deletes_drive() {
+    void drive_service_creates_updates_queries_and_deletes_drive() {
         //Arrange
-        DriveService service = new DriveService(new InMemoryDriveRepository());
-        Drive drive = drive("example1", "700", models());
-        Drive secondDrive = drive("example2", "500", corollaModels());
+        DriveRepository repository = mock(DriveRepository.class);
+        DriveService service = new DriveService(repository, new DriveMapperImpl());
+        Drive drive = drive("FWD", "700", models());
+
+        when(repository.find(drive.getId())).thenReturn(Optional.of(drive), Optional.empty());
+        when(repository.query(any(DriveQuery.class))).thenReturn(List.of(drive));
 
         //Act
-        service.save(drive);
-        service.save(secondDrive);
+        service.create(drive);
+        service.update(drive);
         DriveType actualType = service.get(drive.getId()).driveType();
-        int querySize = service.query(DriveQuery.builder().driveType(DriveType.of("example1")).modelName(ModelName.of("Camry")).build()).size();
+        int querySize = service.query(DriveQuery.builder().driveType(DriveType.of("FWD")).modelName(ModelName.of("Camry")).build()).size();
         service.delete(drive.getId());
 
         //Assert
-        assertEquals(DriveType.of("example1"), actualType);
+        assertEquals(DriveType.of("FWD"), actualType);
         assertEquals(1, querySize);
         assertThrows(IllegalArgumentException.class, () -> service.get(drive.getId()));
+        verify(repository).create(drive);
+        verify(repository).update(drive);
+        verify(repository).delete(drive.getId());
     }
 
     @Test
-    void engine_service_saves_queries_and_deletes_engine() {
+    void engine_service_creates_updates_queries_and_deletes_engine() {
         //Arrange
-        EngineService service = new EngineService(new InMemoryEngineRepository());
+        EngineRepository repository = mock(EngineRepository.class);
+        EngineService service = new EngineService(repository, new EngineMapperImpl());
         Engine engine = engine(220, 2000, "2400", models());
-        Engine secondEngine = engine(150, 1600, "1800", corollaModels());
+
+        when(repository.find(engine.getId())).thenReturn(Optional.of(engine), Optional.empty());
+        when(repository.query(any(EngineQuery.class))).thenReturn(List.of(engine));
 
         //Act
-        service.save(engine);
-        service.save(secondEngine);
+        service.create(engine);
+        service.update(engine);
         EnginePower actualPower = service.get(engine.getId()).power();
         int querySize = service.query(EngineQuery.builder().power(EnginePower.of(220)).volume(EngineVolume.of(2000)).modelName(ModelName.of("Camry")).build()).size();
         service.delete(engine.getId());
@@ -168,18 +145,24 @@ class ApplicationComponentServicesTest {
         assertEquals(EnginePower.of(220), actualPower);
         assertEquals(1, querySize);
         assertThrows(IllegalArgumentException.class, () -> service.get(engine.getId()));
+        verify(repository).create(engine);
+        verify(repository).update(engine);
+        verify(repository).delete(engine.getId());
     }
 
     @Test
-    void fuel_service_saves_queries_and_deletes_fuel() {
+    void fuel_service_creates_updates_queries_and_deletes_fuel() {
         //Arrange
-        FuelService service = new FuelService(new InMemoryFuelRepository());
+        FuelRepository repository = mock(FuelRepository.class);
+        FuelService service = new FuelService(repository, new FuelMapperImpl());
         Fuel fuel = fuel("Petrol", "200", models());
-        Fuel secondFuel = fuel("Diesel", "350", corollaModels());
+
+        when(repository.find(fuel.getId())).thenReturn(Optional.of(fuel), Optional.empty());
+        when(repository.query(any(FuelQuery.class))).thenReturn(List.of(fuel));
 
         //Act
-        service.save(fuel);
-        service.save(secondFuel);
+        service.create(fuel);
+        service.update(fuel);
         FuelType actualType = service.get(fuel.getId()).fuelType();
         int querySize = service.query(FuelQuery.builder().fuelType(FuelType.of("Petrol")).modelName(ModelName.of("Camry")).build()).size();
         service.delete(fuel.getId());
@@ -188,18 +171,24 @@ class ApplicationComponentServicesTest {
         assertEquals(FuelType.of("Petrol"), actualType);
         assertEquals(1, querySize);
         assertThrows(IllegalArgumentException.class, () -> service.get(fuel.getId()));
+        verify(repository).create(fuel);
+        verify(repository).update(fuel);
+        verify(repository).delete(fuel.getId());
     }
 
     @Test
-    void interior_service_saves_queries_and_deletes_interior() {
+    void interior_service_creates_updates_queries_and_deletes_interior() {
         //Arrange
-        InteriorService service = new InteriorService(new InMemoryInteriorRepository());
+        InteriorRepository repository = mock(InteriorRepository.class);
+        InteriorService service = new InteriorService(repository, new InteriorMapperImpl());
         Interior interior = interior("900", models());
-        Interior secondInterior = interior("1200", corollaModels());
+
+        when(repository.find(interior.getId())).thenReturn(Optional.of(interior), Optional.empty());
+        when(repository.query(any(InteriorQuery.class))).thenReturn(List.of(interior));
 
         //Act
-        service.save(interior);
-        service.save(secondInterior);
+        service.create(interior);
+        service.update(interior);
         Money actualPrice = service.get(interior.getId()).price();
         int querySize = service.query(InteriorQuery.builder().modelName(ModelName.of("Camry")).maxPrice(money("1000")).build()).size();
         service.delete(interior.getId());
@@ -208,18 +197,24 @@ class ApplicationComponentServicesTest {
         assertEquals(interior.getPrice(), actualPrice);
         assertEquals(1, querySize);
         assertThrows(RuntimeException.class, () -> service.get(interior.getId()));
+        verify(repository).create(interior);
+        verify(repository).update(interior);
+        verify(repository).delete(interior.getId());
     }
 
     @Test
-    void model_service_saves_queries_and_deletes_model() {
+    void model_service_creates_updates_queries_and_deletes_model() {
         //Arrange
-        ModelService service = new ModelService(new InMemoryModelRepository());
+        ModelRepository repository = mock(ModelRepository.class);
+        ModelService service = new ModelService(repository, new ModelMapperImpl());
         Model model = model("Camry", "1200", models());
-        Model secondModel = model("Corolla", "1800", corollaModels());
+
+        when(repository.find(model.getId())).thenReturn(Optional.of(model), Optional.empty());
+        when(repository.query(any(ModelQuery.class))).thenReturn(List.of(model));
 
         //Act
-        service.save(model);
-        service.save(secondModel);
+        service.create(model);
+        service.update(model);
         ModelName actualName = service.get(model.getId()).modelName();
         int querySize = service.query(ModelQuery.builder().modelName(ModelName.of("Camry")).maxPrice(money("1400")).build()).size();
         service.delete(model.getId());
@@ -228,18 +223,24 @@ class ApplicationComponentServicesTest {
         assertEquals(ModelName.of("Camry"), actualName);
         assertEquals(1, querySize);
         assertThrows(IllegalArgumentException.class, () -> service.get(model.getId()));
+        verify(repository).create(model);
+        verify(repository).update(model);
+        verify(repository).delete(model.getId());
     }
 
     @Test
-    void steering_service_saves_queries_and_deletes_steering() {
+    void steering_service_creates_updates_queries_and_deletes_steering() {
         //Arrange
-        SteeringService service = new SteeringService(new InMemorySteeringRepository());
+        SteeringRepository repository = mock(SteeringRepository.class);
+        SteeringService service = new SteeringService(repository, new SteeringMapperImpl());
         Steering steering = steering("250", models());
-        Steering secondSteering = steering("450", corollaModels());
+
+        when(repository.find(steering.getId())).thenReturn(Optional.of(steering), Optional.empty());
+        when(repository.query(any(SteeringQuery.class))).thenReturn(List.of(steering));
 
         //Act
-        service.save(steering);
-        service.save(secondSteering);
+        service.create(steering);
+        service.update(steering);
         Money actualPrice = service.get(steering.getId()).price();
         int querySize = service.query(SteeringQuery.builder().modelName(ModelName.of("Camry")).maxPrice(money("300")).build()).size();
         service.delete(steering.getId());
@@ -248,18 +249,24 @@ class ApplicationComponentServicesTest {
         assertEquals(steering.getPrice(), actualPrice);
         assertEquals(1, querySize);
         assertThrows(RuntimeException.class, () -> service.get(steering.getId()));
+        verify(repository).create(steering);
+        verify(repository).update(steering);
+        verify(repository).delete(steering.getId());
     }
 
     @Test
-    void transmission_service_saves_queries_and_deletes_transmission() {
+    void transmission_service_creates_updates_queries_and_deletes_transmission() {
         //Arrange
-        TransmissionService service = new TransmissionService(new InMemoryTransmissonRepository());
+        TransmissonRepository repository = mock(TransmissonRepository.class);
+        TransmissionService service = new TransmissionService(repository, new TransmissionMapperImpl());
         Transmission transmission = transmission("example1", "1400", models());
-        Transmission secondTransmission = transmission("example2", "1100", corollaModels());
+
+        when(repository.find(transmission.getId())).thenReturn(Optional.of(transmission), Optional.empty());
+        when(repository.query(any(TransmissionQuery.class))).thenReturn(List.of(transmission));
 
         //Act
-        service.save(transmission);
-        service.save(secondTransmission);
+        service.create(transmission);
+        service.update(transmission);
         TransmissionType actualType = service.get(transmission.getId()).type();
         int querySize = service.query(TransmissionQuery.builder().type(TransmissionType.of("example1")).modelName(ModelName.of("Camry")).build()).size();
         service.delete(transmission.getId());
@@ -268,18 +275,24 @@ class ApplicationComponentServicesTest {
         assertEquals(TransmissionType.of("example1"), actualType);
         assertEquals(1, querySize);
         assertThrows(IllegalArgumentException.class, () -> service.get(transmission.getId()));
+        verify(repository).create(transmission);
+        verify(repository).update(transmission);
+        verify(repository).delete(transmission.getId());
     }
 
     @Test
-    void wheel_service_saves_queries_and_deletes_wheel() {
+    void wheel_service_creates_updates_queries_and_deletes_wheel() {
         //Arrange
-        WheelService service = new WheelService(new InMemoryWheelRepository());
+        WheelRepository repository = mock(WheelRepository.class);
+        WheelService service = new WheelService(repository, new WheelMapperImpl());
         Wheel wheel = wheel("450", models());
-        Wheel secondWheel = wheel("650", corollaModels());
+
+        when(repository.find(wheel.getId())).thenReturn(Optional.of(wheel), Optional.empty());
+        when(repository.query(any(WheelQuery.class))).thenReturn(List.of(wheel));
 
         //Act
-        service.save(wheel);
-        service.save(secondWheel);
+        service.create(wheel);
+        service.update(wheel);
         Money actualPrice = service.get(wheel.getId()).price();
         int querySize = service.query(WheelQuery.builder().modelName(ModelName.of("Camry")).maxPrice(money("700")).build()).size();
         service.delete(wheel.getId());
@@ -288,18 +301,24 @@ class ApplicationComponentServicesTest {
         assertEquals(wheel.getPrice(), actualPrice);
         assertEquals(1, querySize);
         assertThrows(IllegalArgumentException.class, () -> service.get(wheel.getId()));
+        verify(repository).create(wheel);
+        verify(repository).update(wheel);
+        verify(repository).delete(wheel.getId());
     }
 
     @Test
-    void car_service_saves_queries_and_deletes_car() {
+    void car_service_creates_updates_queries_and_deletes_car() {
         //Arrange
-        CarService service = new CarService(new InMemoryCarRepository());
+        CarRepository repository = mock(CarRepository.class);
+        CarService service = new CarService(repository, new CarMapperImpl());
         Car car = car("Camry", "15000", models());
-        Car secondCar = car("Corolla", "21000", corollaModels());
+
+        when(repository.find(car.getId())).thenReturn(Optional.of(car), Optional.empty());
+        when(repository.query(any(CarQuery.class))).thenReturn(List.of(car));
 
         //Act
-        service.save(car);
-        service.save(secondCar);
+        service.create(car);
+        service.update(car);
         Id actualId = service.get(car.getId()).id();
         int querySize = service.query(
                 CarQuery.builder()
@@ -307,10 +326,11 @@ class ApplicationComponentServicesTest {
                         .modelName(ModelName.of("Camry"))
                         .bodyType(BodyType.of("Sedan"))
                         .color(ColorValue.of("Black"))
-                        .driveType(DriveType.of("example1"))
+                        .driveType(DriveType.of("FWD"))
                         .enginePower(EnginePower.of(220))
                         .engineVolume(EngineVolume.of(2000))
                         .fuelType(FuelType.of("Petrol"))
+                        .transmissionType(TransmissionType.of("example1"))
                         .minPrice(money("14000"))
                         .maxPrice(money("16000"))
                         .build()
@@ -321,14 +341,13 @@ class ApplicationComponentServicesTest {
         assertEquals(car.getId(), actualId);
         assertEquals(1, querySize);
         assertThrows(IllegalArgumentException.class, () -> service.get(car.getId()));
+        verify(repository).create(car);
+        verify(repository).update(car);
+        verify(repository).delete(car.getId());
     }
 
     private static Set<ModelName> models() {
         return Set.of(ModelName.of("Camry"), ModelName.of("Corolla"));
-    }
-
-    private static Set<ModelName> corollaModels() {
-        return Set.of(ModelName.of("Corolla"));
     }
 
     private static Money money(String amount) {
@@ -385,7 +404,7 @@ class ApplicationComponentServicesTest {
                 .bodyType(body("Sedan", "1000", suitableModels))
                 .brandName(brand("Toyota", "1500", suitableModels))
                 .color(color("Black", "300", suitableModels))
-                .driveType(drive("example1", "700", suitableModels))
+                .driveType(drive("FWD", "700", suitableModels))
                 .engine(engine(220, 2000, "2400", suitableModels))
                 .fuel(fuel("Petrol", "200", suitableModels))
                 .model(model(modelName, "1200", suitableModels))

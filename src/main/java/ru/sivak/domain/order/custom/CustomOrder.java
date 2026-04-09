@@ -11,7 +11,7 @@ public class CustomOrder extends BaseOrder {
     private CustomOrderState state;
 
     public CustomOrder(@NonNull Id id, @NonNull Id managerId, @NonNull Id clientId, @NonNull Car car) {
-        super(id, managerId, clientId, car.getPrice());
+        super(id, managerId, clientId, car.getId(), car.getPrice());
         this.state = new CreatedState();
     }
 
@@ -50,6 +50,7 @@ public class CustomOrder extends BaseOrder {
     }
 
     public void updateCar(@NonNull Car newCar) {
+        setCarId(newCar.getId());
         setPrice(newCar.getPrice());
 
     }

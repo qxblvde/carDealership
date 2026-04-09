@@ -1,18 +1,14 @@
 package ru.sivak.application.mappers;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.sivak.application.dto.BodyDto;
 import ru.sivak.domain.entities.Body;
 
+@Mapper(componentModel = "spring")
+public interface BodyMapper {
 
-public class BodyMapper {
-    private BodyMapper() {}
-
-    public static BodyDto toDto(Body body) {
-        return new BodyDto(
-                body.getBodyType(),
-                body.getPrice(),
-                body.getComponentName(),
-                body.getSuitableModels()
-        );
-    }
+    @Mapping(target = "type", source = "bodyType")
+    @Mapping(target = "modelName", source = "componentName")
+    BodyDto map(Body body);
 }

@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface ISteeringService {
 
-    SteeringDto save(Steering steering);
+    SteeringDto create(Steering steering);
+
+    SteeringDto update(Steering steering);
 
     void delete(Id id);
 

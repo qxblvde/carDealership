@@ -2,6 +2,7 @@ package ru.sivak.application.servicesImpl;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.sivak.application.dto.InteriorDto;
 import ru.sivak.application.mappers.InteriorMapper;
 import ru.sivak.application.query.InteriorQuery;
@@ -13,15 +14,25 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class InteriorService implements IInteriorService {
     @NonNull
     private final InteriorRepository interiorRepository;
 
+    @NonNull
+    private final InteriorMapper interiorMapper;
+
 
     @Override
-    public InteriorDto save(Interior interior) {
-        interiorRepository.save(interior);
-        return InteriorMapper.toDto(interior);
+    public InteriorDto create(Interior interior) {
+        interiorRepository.create(interior);
+        return interiorMapper.map(interior);
+    }
+
+    
+    public InteriorDto update(Interior interior) {
+        interiorRepository.update(interior);
+        return interiorMapper.map(interior);
     }
 
     @Override
@@ -33,7 +44,7 @@ public class InteriorService implements IInteriorService {
     public List<InteriorDto> findAll() {
         return interiorRepository.findAll()
                 .stream()
-                .map(InteriorMapper::toDto)
+                .map(interiorMapper::map)
                 .toList();
     }
 
@@ -41,14 +52,14 @@ public class InteriorService implements IInteriorService {
     public List<InteriorDto> query(InteriorQuery query) {
         return interiorRepository.query(query)
                 .stream()
-                .map(InteriorMapper::toDto)
+                .map(interiorMapper::map)
                 .toList();
     }
 
     @Override
     public InteriorDto get(Id id) {
         return interiorRepository.find(id)
-                .map(InteriorMapper::toDto)
+                .map(interiorMapper::map)
                 .orElseThrow(() -> new RuntimeException("Interior not found"));
     }
 }

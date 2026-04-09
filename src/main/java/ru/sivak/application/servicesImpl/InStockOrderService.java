@@ -2,6 +2,7 @@ package ru.sivak.application.servicesImpl;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.sivak.application.dto.OrderDto;
 import ru.sivak.application.mappers.OrderMapper;
 import ru.sivak.application.query.InStockOrderQuery;
@@ -15,50 +16,82 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class InStockOrderService implements IInStockOrderService {
     @NonNull
     private final InStockOrderRepository inStockOrderRepository;
     @NonNull
     private final CarRepository carRepository;
 
-    public OrderDto create(@NonNull Id clientId, @NonNull Id carId) {
+    @NonNull
+    private final OrderMapper orderMapper;
+
+    public OrderDto create(@NonNull Id managerId, @NonNull Id clientId, @NonNull Id carId) {
         Car car = carRepository.find(carId)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
-        InStockOrder order = new InStockOrder(Id.newId(), Id.newId(), clientId, car);
-        inStockOrderRepository.save(order);
-        return OrderMapper.toDto(order);
+        InStockOrder order = new InStockOrder(Id.newId(), managerId, clientId, car);
+        inStockOrderRepository.create(order);
+        return orderMapper.map(order);
     }
 
     public List<OrderDto> query(@NonNull InStockOrderQuery query) {
         return inStockOrderRepository.query(query)
                 .stream()
-                .map(OrderMapper::toDto)
+                .map(orderMapper::map)
                 .toList();
     }
 
     public void approve(@NonNull Id orderId) {
-        get(orderId).approve();
+        InStockOrder order = get(orderId);
+        if (!order.approve()) {
+            throw new IllegalArgumentException("Invalid in-stock order transition");
+        }
+        inStockOrderRepository.update(order);
     }
     public void requestPayment(@NonNull Id orderId) {
-        get(orderId).requestPayment();
+        InStockOrder order = get(orderId);
+        if (!order.requestPayment()) {
+            throw new IllegalArgumentException("Invalid in-stock order transition");
+        }
+        inStockOrderRepository.update(order);
     }
     public void pay(@NonNull Id orderId) {
-        get(orderId).pay();
+        InStockOrder order = get(orderId);
+        if (!order.pay()) {
+            throw new IllegalArgumentException("Invalid in-stock order transition");
+        }
+        inStockOrderRepository.update(order);
     }
 
     public void complete(@NonNull Id orderId) {
-        get(orderId).complete();
+        InStockOrder order = get(orderId);
+        if (!order.complete()) {
+            throw new IllegalArgumentException("Invalid in-stock order transition");
+        }
+        inStockOrderRepository.update(order);
     }
     public void cancel(@NonNull Id orderId) {
-        get(orderId).cancel();
+        InStockOrder order = get(orderId);
+        if (!order.cancel()) {
+            throw new IllegalArgumentException("Invalid in-stock order transition");
+        }
+        inStockOrderRepository.update(order);
     }
     public void markAsReady(@NonNull Id orderId) {
-        get(orderId).markAsReady();
+        InStockOrder order = get(orderId);
+        if (!order.markAsReady()) {
+            throw new IllegalArgumentException("Invalid in-stock order transition");
+        }
+        inStockOrderRepository.update(order);
     }
 
     public InStockOrder get(@NonNull Id id) {
         return inStockOrderRepository.find(id)
                 .orElseThrow(() -> new IllegalArgumentException("order not found"));
+    }
+
+    public OrderDto getDto(@NonNull Id id) {
+        return orderMapper.map(get(id));
     }
 
     public OrderDto update(@NonNull Id orderId, @NonNull Id newClientId, @NonNull Id newCarId) {
@@ -70,9 +103,9 @@ public class InStockOrderService implements IInStockOrderService {
         order.updateClient(newClientId);
         order.updateCar(newCar);
 
-        inStockOrderRepository.save(order);
+        inStockOrderRepository.update(order);
 
-        return OrderMapper.toDto(order);
+        return orderMapper.map(order);
     }
-}
 
+}

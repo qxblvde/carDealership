@@ -9,7 +9,7 @@ public class InStockOrder extends BaseOrder {
     private InStockOrderState state;
 
     public InStockOrder(@NonNull Id id, @NonNull Id clientId, @NonNull Id managerId, @NonNull Car car) {
-        super(id, clientId, managerId, car.getPrice());
+        super(id, clientId, managerId, car.getId(), car.getPrice());
         this.state = new CreatedState();
     }
 
@@ -49,6 +49,7 @@ public class InStockOrder extends BaseOrder {
     }
 
     public void updateCar(@NonNull Car newCar) {
+        setCarId(newCar.getId());
         setPrice(newCar.getPrice());
     }
 }

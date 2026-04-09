@@ -1,17 +1,11 @@
 package ru.sivak.application.mappers;
 
+import org.mapstruct.Mapper;
 import ru.sivak.application.dto.DriveDto;
 import ru.sivak.domain.entities.Drive;
 
-public class DriveMapper {
-    private DriveMapper() {}
+@Mapper(componentModel = "spring")
+public interface DriveMapper {
 
-    public static DriveDto toDriveDto(Drive drive) {
-        return new DriveDto(
-                drive.getDriveType(),
-                drive.getPrice(),
-                drive.getComponentName(),
-                drive.getSuitableModels()
-        );
-    }
+    DriveDto map(Drive drive);
 }

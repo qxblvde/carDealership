@@ -2,6 +2,7 @@ package ru.sivak.application.servicesImpl;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.sivak.application.dto.TestDriveRequestDto;
 import ru.sivak.application.mappers.TestDriveMapper;
 import ru.sivak.application.query.TestDriveRequestQuery;
@@ -15,9 +16,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class TestDriveRequestService implements ITestDriveRequestService {
     @NonNull
     private final TestDriveRequestRepository repository;
+    @NonNull
+    private final TestDriveMapper testDriveMapper;
 
     public TestDriveRequestDto create(@NonNull Id clientId, @NonNull Id carId, @NonNull LocalDate scheduledTime) {
         TestDriveRequest request = TestDriveRequest.builder()
@@ -26,13 +30,13 @@ public class TestDriveRequestService implements ITestDriveRequestService {
                 .carId(carId)
                 .scheduledTime(scheduledTime)
                 .build();
-        repository.save(request);
-        return TestDriveMapper.toDto(request);
+        repository.create(request);
+        return testDriveMapper.map(request);
     }
     public List<TestDriveRequestDto> query(@NonNull TestDriveRequestQuery query) {
         return repository.query(query)
                 .stream()
-                .map(TestDriveMapper::toDto)
+                .map(testDriveMapper::map)
                 .toList();
     }
 
@@ -42,7 +46,7 @@ public class TestDriveRequestService implements ITestDriveRequestService {
 
     public TestDriveRequestDto get(@NonNull Id id) {
         return repository.find(id)
-                .map(TestDriveMapper::toDto)
+                .map(testDriveMapper::map)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found"));
     }
 
@@ -54,8 +58,8 @@ public class TestDriveRequestService implements ITestDriveRequestService {
         request.updateCar(newCarId);
         request.updateScheduledTime(newTime);
 
-        repository.save(request);
+        repository.update(request);
 
-        return TestDriveMapper.toDto(request);
+        return testDriveMapper.map(request);
     }
 }

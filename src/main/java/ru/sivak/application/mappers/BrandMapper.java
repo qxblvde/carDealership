@@ -1,17 +1,13 @@
 package ru.sivak.application.mappers;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.sivak.application.dto.BrandDto;
 import ru.sivak.domain.entities.Brand;
 
-public class BrandMapper {
-    private BrandMapper() {}
+@Mapper(componentModel = "spring")
+public interface BrandMapper {
 
-    public static BrandDto toDto(Brand brand) {
-        return new BrandDto(
-                brand.getName(),
-                brand.getPrice(),
-                brand.getComponentName(),
-                brand.getSuitableModels()
-        );
-    }
+    @Mapping(target = "brandName", source = "name")
+    BrandDto map(Brand brand);
 }

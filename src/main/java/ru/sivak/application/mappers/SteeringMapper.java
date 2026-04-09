@@ -1,17 +1,11 @@
 package ru.sivak.application.mappers;
 
+import org.mapstruct.Mapper;
 import ru.sivak.application.dto.SteeringDto;
 import ru.sivak.domain.entities.Steering;
 
-public class SteeringMapper {
+@Mapper(componentModel = "spring")
+public interface SteeringMapper {
 
-    private SteeringMapper() {}
-
-    public static SteeringDto toDto(Steering steering) {
-        return new SteeringDto(
-                steering.getPrice(),
-                steering.getComponentName(),
-                steering.getSuitableModels()
-        );
-    }
+    SteeringDto map(Steering steering);
 }

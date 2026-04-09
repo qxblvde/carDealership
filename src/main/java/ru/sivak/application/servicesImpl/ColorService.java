@@ -1,6 +1,8 @@
 package ru.sivak.application.servicesImpl;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.sivak.application.dto.ColorDto;
 import ru.sivak.application.mappers.ColorMapper;
 import ru.sivak.application.query.ColorQuery;
@@ -12,14 +14,24 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class ColorService implements IColorService
 {
-
+    @NonNull
     private final ColorRepository colorRepository;
+
+    @NonNull
+    private final ColorMapper colorMapper;
     @Override
-    public ColorDto save(Color color) {
-        colorRepository.save(color);
-        return ColorMapper.toDto(color);
+    public ColorDto create(Color color) {
+        colorRepository.create(color);
+        return colorMapper.map(color);
+    }
+
+    
+    public ColorDto update(Color color) {
+        colorRepository.update(color);
+        return colorMapper.map(color);
     }
 
     @Override
@@ -31,7 +43,7 @@ public class ColorService implements IColorService
     public List<ColorDto> findAll() {
         return colorRepository.findAll()
                 .stream()
-                .map(ColorMapper::toDto)
+                .map(colorMapper::map)
                 .toList();
     }
 
@@ -39,14 +51,14 @@ public class ColorService implements IColorService
     public List<ColorDto> query(ColorQuery query) {
         return colorRepository.query(query)
                 .stream()
-                .map(ColorMapper::toDto)
+                .map(colorMapper::map)
                 .toList();
     }
 
     @Override
     public ColorDto get(Id id) {
         return colorRepository.find(id)
-                .map(ColorMapper::toDto)
+                .map(colorMapper::map)
                 .orElseThrow(() -> new IllegalArgumentException("Color not found"));
     }
 }

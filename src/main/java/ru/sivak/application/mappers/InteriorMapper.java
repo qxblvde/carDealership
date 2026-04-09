@@ -1,17 +1,11 @@
 package ru.sivak.application.mappers;
 
+import org.mapstruct.Mapper;
 import ru.sivak.application.dto.InteriorDto;
 import ru.sivak.domain.entities.Interior;
 
-public class InteriorMapper {
+@Mapper(componentModel = "spring")
+public interface InteriorMapper {
 
-    private InteriorMapper() {}
-
-    public static InteriorDto toDto(Interior interior) {
-        return new InteriorDto(
-                interior.getPrice(),
-                interior.getComponentName(),
-                interior.getSuitableModels()
-        );
-    }
+    InteriorDto map(Interior interior);
 }

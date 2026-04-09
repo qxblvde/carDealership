@@ -8,7 +8,7 @@ import ru.sivak.domain.valueObjects.Id;
 import java.util.List;
 
 public interface ICustomOrderService {
-    OrderDto create(Id clientId, Id carId);
+    OrderDto create(Id managerId, Id clientId, Id carId);
     List<OrderDto> query(CustomOrderQuery query);
     void approve(Id orderId);
     void requestPayment(Id orderId);
@@ -19,5 +19,6 @@ public interface ICustomOrderService {
     void markAsReady(Id orderId);
 
     CustomOrder get(Id id);
+    OrderDto getDto(Id id);
     OrderDto update(Id orderId, Id newClientId, Id newCarId);
 }
