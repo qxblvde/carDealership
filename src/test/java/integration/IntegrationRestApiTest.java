@@ -5,11 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -18,11 +20,14 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.sivak.Main;
 
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,7 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class IntegrationRestApiTest {
 
     private static final String MANAGER_ID = "00000000-0000-0000-0000-000000000001";
-    private static final String CLIENT_ID = "00000000-0000-0000-0000-000000000002";
     private static final String CAR_ID = "00000000-0000-0000-0000-000000002001";
 
     @Container
@@ -59,7 +63,9 @@ class IntegrationRestApiTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
     }
 
     @Test
@@ -67,7 +73,8 @@ class IntegrationRestApiTest {
         //Assert
         mockMvc.perform(get("/api/cars")
                         .param("brandName", "Toyota")
-                        .param("modelName", "Camry"))
+                        .param("modelName", "Camry")
+                        .with(jwtFor("user1", "USER")))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Camry")))
                 .andExpect(content().string(containsString("Toyota")));
@@ -95,14 +102,15 @@ class IntegrationRestApiTest {
         //Act
         MvcResult createResult = mockMvc.perform(post("/api/cars")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(request)
+                        .with(jwtFor("manager1", "MANAGER")))
                 .andExpect(status().isOk())
                 .andReturn();
 
         UUID carId = extractId(createResult.getResponse().getContentAsString());
 
         //Assert
-        mockMvc.perform(get("/api/cars/{id}", carId))
+        mockMvc.perform(get("/api/cars/{id}", carId).with(jwtFor("user1", "USER")))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(carId.toString())));
     }
@@ -113,22 +121,22 @@ class IntegrationRestApiTest {
         String request = """
                 {
                   "managerId": "%s",
-                  "clientId": "%s",
                   "carId": "%s"
                 }
-                """.formatted(MANAGER_ID, CLIENT_ID, CAR_ID);
+                """.formatted(MANAGER_ID, CAR_ID);
 
         //Act
         MvcResult createResult = mockMvc.perform(post("/api/orders/custom")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(request)
+                        .with(jwtFor("user1", "USER")))
                 .andExpect(status().isOk())
                 .andReturn();
 
         UUID orderId = extractId(createResult.getResponse().getContentAsString());
 
         //Assert
-        mockMvc.perform(get("/api/orders/custom/{id}", orderId))
+        mockMvc.perform(get("/api/orders/custom/{id}", orderId).with(jwtFor("user1", "USER")))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(orderId.toString())))
                 .andExpect(content().string(containsString("CreatedState")));
@@ -140,22 +148,23 @@ class IntegrationRestApiTest {
         String request = """
                 {
                   "managerId": "%s",
-                  "clientId": "%s",
                   "carId": "%s"
                 }
-                """.formatted(MANAGER_ID, CLIENT_ID, CAR_ID);
+                """.formatted(MANAGER_ID, CAR_ID);
 
         //Act
         MvcResult createResult = mockMvc.perform(post("/api/orders/custom")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(request)
+                        .with(jwtFor("user1", "USER")))
                 .andExpect(status().isOk())
                 .andReturn();
 
         UUID orderId = extractId(createResult.getResponse().getContentAsString());
 
         //Assert
-        mockMvc.perform(post("/api/orders/custom/{id}/complete", orderId))
+        mockMvc.perform(post("/api/orders/custom/{id}/complete", orderId)
+                        .with(jwtFor("manager1", "MANAGER")))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("Invalid custom order transition")));
     }
@@ -165,32 +174,42 @@ class IntegrationRestApiTest {
         //Arrange
         String request = """
                 {
-                  "clientId": "%s",
                   "carId": "%s",
                   "scheduledTime": "2026-04-03"
                 }
-                """.formatted(CLIENT_ID, CAR_ID);
+                """.formatted(CAR_ID);
 
         //Act
         MvcResult createResult = mockMvc.perform(post("/api/test-drive-requests")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(request)
+                        .with(jwtFor("user1", "USER")))
                 .andExpect(status().isOk())
                 .andReturn();
 
         UUID requestId = extractId(createResult.getResponse().getContentAsString());
 
         //Assert
-        mockMvc.perform(get("/api/test-drive-requests/{id}", requestId))
+        mockMvc.perform(get("/api/test-drive-requests/{id}", requestId).with(jwtFor("user1", "USER")))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(requestId.toString())))
                 .andExpect(content().string(containsString("2026-04-03")));
 
-        mockMvc.perform(delete("/api/test-drive-requests/{id}", requestId))
+        mockMvc.perform(delete("/api/test-drive-requests/{id}", requestId).with(jwtFor("user1", "USER")))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/test-drive-requests/{id}", requestId))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/test-drive-requests/{id}", requestId).with(jwtFor("user1", "USER")))
+                .andExpect(status().isForbidden());
+    }
+
+    private RequestPostProcessor jwtFor(String username, String... roles) {
+        SimpleGrantedAuthority[] authorities = Arrays.stream(roles)
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .toArray(SimpleGrantedAuthority[]::new);
+
+        return jwt()
+                .jwt(jwt -> jwt.subject(username).claim("preferred_username", username))
+                .authorities(authorities);
     }
 
     private UUID extractId(String rawJson) {

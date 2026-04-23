@@ -23,7 +23,7 @@ public class TestDriveRequestController {
     @PostMapping
     public TestDriveRequestDto create(@RequestBody CreateTestDriveRequest request) {
         TestDriveRequestRestMapper.CreateCommand command = testDriveRequestRestMapper.toCreateCommand(request);
-        return testDriveRequestService.create(command.clientId(), command.carId(), command.scheduledTime());
+        return testDriveRequestService.create(command.carId(), command.scheduledTime());
     }
 
     @GetMapping
@@ -44,7 +44,7 @@ public class TestDriveRequestController {
     @PutMapping("/{id}")
     public TestDriveRequestDto update(@PathVariable UUID id, @RequestBody UpdateTestDriveRequest request) {
         TestDriveRequestRestMapper.UpdateCommand command = testDriveRequestRestMapper.toUpdateCommand(id, request);
-        return testDriveRequestService.update(command.requestId(), command.clientId(), command.carId(), command.scheduledTime());
+        return testDriveRequestService.update(command.requestId(), command.carId(), command.scheduledTime());
     }
 
     @DeleteMapping("/{id}")

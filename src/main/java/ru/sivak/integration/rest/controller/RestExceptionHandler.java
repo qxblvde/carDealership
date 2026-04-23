@@ -2,6 +2,7 @@ package ru.sivak.integration.rest.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +30,13 @@ public class RestExceptionHandler {
         }
         return ResponseEntity.badRequest().body(
                 new ApiErrorResponse(message, HttpStatus.BAD_REQUEST.value(), Instant.now())
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccessDenied(AccessDeniedException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                new ApiErrorResponse(exception.getMessage(), HttpStatus.FORBIDDEN.value(), Instant.now())
         );
     }
 

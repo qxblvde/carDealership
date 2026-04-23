@@ -36,6 +36,10 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
     testAnnotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
     testAnnotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
+
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    testImplementation("org.springframework.security:spring-security-test")
 }
 
 tasks.test {

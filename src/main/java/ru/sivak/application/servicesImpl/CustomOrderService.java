@@ -2,6 +2,7 @@ package ru.sivak.application.servicesImpl;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import ru.sivak.application.dto.OrderDto;
 import ru.sivak.application.mappers.OrderMapper;
@@ -12,6 +13,7 @@ import ru.sivak.domain.order.custom.CustomOrder;
 import ru.sivak.domain.repositories.CarRepository;
 import ru.sivak.domain.repositories.CustomOrderRepository;
 import ru.sivak.domain.valueObjects.Id;
+import ru.sivak.infrastructure.security.AuthenticatedUserService;
 
 import java.util.List;
 
@@ -22,26 +24,39 @@ public class CustomOrderService implements ICustomOrderService {
     private final CustomOrderRepository customOrderRepository;
     @NonNull
     private final CarRepository carRepository;
-
     @NonNull
     private final OrderMapper orderMapper;
+    @NonNull
+    private final AuthenticatedUserService authenticatedUserService;
 
-    public OrderDto create(@NonNull Id managerId, @NonNull Id clientId, @NonNull Id carId) {
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public OrderDto create(@NonNull Id managerId, @NonNull Id carId) {
         Car car = carRepository.find(carId)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+
+        Id clientId = authenticatedUserService.getCurrentUserId();
         CustomOrder order = new CustomOrder(Id.newId(), managerId, clientId, car);
+
         customOrderRepository.create(order);
         return orderMapper.map(order);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('MANAGER') or hasRole('ADMIN')")
     public List<OrderDto> query(@NonNull CustomOrderQuery query) {
-        return customOrderRepository.query(query)
+        CustomOrderQuery dublicate = query;
+        if (authenticatedUserService.hasRole("MANAGER") == false && authenticatedUserService.hasRole("ADMIN") == false) {
+            dublicate = query.toBuilder()
+                    .clientId(authenticatedUserService.getCurrentUserId())
+                    .build();
+        }
+
+        return customOrderRepository.query(dublicate)
                 .stream()
                 .map(orderMapper::map)
                 .toList();
-
     }
 
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public void approve(@NonNull Id orderId) {
         CustomOrder order = get(orderId);
         if (!order.approve()) {
@@ -49,6 +64,8 @@ public class CustomOrderService implements ICustomOrderService {
         }
         customOrderRepository.update(order);
     }
+
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public void requestPayment(@NonNull Id orderId) {
         CustomOrder order = get(orderId);
         if (!order.requestPayment()) {
@@ -56,6 +73,8 @@ public class CustomOrderService implements ICustomOrderService {
         }
         customOrderRepository.update(order);
     }
+
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @orderAccessChecker.isCurrentCustomOrderOwner(#orderId))")
     public void pay(@NonNull Id orderId) {
         CustomOrder order = get(orderId);
         if (!order.pay()) {
@@ -63,6 +82,8 @@ public class CustomOrderService implements ICustomOrderService {
         }
         customOrderRepository.update(order);
     }
+
+    @PreAuthorize("hasRole('WAREHOUSE_ADMIN') or hasRole('ADMIN')")
     public void requestDelivery(@NonNull Id orderId) {
         CustomOrder order = get(orderId);
         if (!order.requestDelivery()) {
@@ -70,6 +91,8 @@ public class CustomOrderService implements ICustomOrderService {
         }
         customOrderRepository.update(order);
     }
+
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public void complete(@NonNull Id orderId) {
         CustomOrder order = get(orderId);
         if (!order.complete()) {
@@ -77,6 +100,8 @@ public class CustomOrderService implements ICustomOrderService {
         }
         customOrderRepository.update(order);
     }
+
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @orderAccessChecker.isCurrentCustomOrderOwner(#orderId))")
     public void cancel(@NonNull Id orderId) {
         CustomOrder order = get(orderId);
         if (!order.cancel()) {
@@ -84,6 +109,8 @@ public class CustomOrderService implements ICustomOrderService {
         }
         customOrderRepository.update(order);
     }
+
+    @PreAuthorize("hasRole('WAREHOUSE_ADMIN') or hasRole('ADMIN')")
     public void markAsReady(@NonNull Id orderId) {
         CustomOrder order = get(orderId);
         if (!order.markAsReady()) {
@@ -97,22 +124,21 @@ public class CustomOrderService implements ICustomOrderService {
                 .orElseThrow(() -> new IllegalArgumentException("order not found"));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or (hasRole('USER') and @orderAccessChecker.isCurrentCustomOrderOwner(#id))")
     public OrderDto getDto(@NonNull Id id) {
         return orderMapper.map(get(id));
     }
 
-    public OrderDto update(@NonNull Id orderId, @NonNull Id newClientId, @NonNull Id newCarId) {
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @orderAccessChecker.isCurrentCustomOrderOwner(#orderId))")
+    public OrderDto update(@NonNull Id orderId, @NonNull Id newCarId) {
         CustomOrder order = get(orderId);
 
         Car newCar = carRepository.find(newCarId)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
 
-        order.updateClient(newClientId);
         order.updateCar(newCar);
-
         customOrderRepository.update(order);
 
         return orderMapper.map(order);
     }
-
 }

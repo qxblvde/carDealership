@@ -24,7 +24,7 @@ public class InStockOrderController {
     @PostMapping
     public OrderDto create(@RequestBody CreateOrderRequest request) {
         InStockOrderRequestMapper.CreateCommand command = inStockOrderRequestMapper.toCreateCommand(request);
-        return inStockOrderService.create(command.managerId(), command.clientId(), command.carId());
+        return inStockOrderService.create(command.managerId(), command.carId());
     }
 
     @GetMapping
@@ -46,7 +46,7 @@ public class InStockOrderController {
     @PutMapping("/{id}")
     public OrderDto update(@PathVariable UUID id, @RequestBody UpdateOrderRequest request) {
         InStockOrderRequestMapper.UpdateCommand command = inStockOrderRequestMapper.toUpdateCommand(id, request);
-        return inStockOrderService.update(command.orderId(), command.clientId(), command.carId());
+        return inStockOrderService.update(command.orderId(), command.carId());
     }
 
     @PostMapping("/{id}/approve")
