@@ -1,7 +1,9 @@
 package ru.sivak.integration.rest.mapper;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValueMappingStrategy;
 import ru.sivak.application.query.CarQuery;
 import ru.sivak.domain.valueObjects.BodyType;
 import ru.sivak.domain.valueObjects.BrandName;
@@ -35,6 +37,7 @@ public interface CarRequestMapper {
     @Mapping(target = "interiorId", source = "request.interiorId")
     CreateCar toCreateCar(CreateCarRequest request);
 
+    @BeanMapping(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
     CarQuery toQuery(
             String brandName,
             String modelName,

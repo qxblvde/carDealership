@@ -18,3 +18,13 @@ databaseChangeLog:
             relativeToChangelogFile: false
             splitStatements: true
             stripComments: true
+
+  - changeSet:
+      id: 003-keycloak-security-users
+      author: maxim sivak
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/003-keycloak-security-users.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: true

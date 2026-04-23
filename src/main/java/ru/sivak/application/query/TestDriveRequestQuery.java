@@ -7,7 +7,7 @@ import ru.sivak.domain.valueObjects.Id;
 import java.time.LocalDate;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 public class TestDriveRequestQuery {
     private final Id clientId;
     private final Id carId;

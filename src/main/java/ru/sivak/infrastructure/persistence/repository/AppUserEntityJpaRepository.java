@@ -8,5 +8,6 @@ import java.util.UUID;
 
 public interface AppUserEntityJpaRepository extends JpaRepository<AppUserEntity, UUID> {
     Optional<AppUserEntity> findByIdAndRemovedFalse(UUID id);
-}
 
+    Optional<AppUserEntity> findByUsernameAndRemovedFalse(String username);
+}

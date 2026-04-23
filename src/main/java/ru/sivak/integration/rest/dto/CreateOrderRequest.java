@@ -6,7 +6,6 @@ import java.util.UUID;
 
 public record CreateOrderRequest(
         @NotNull UUID managerId,
-        @NotNull UUID clientId,
         @NotNull UUID carId
 ) {
 }

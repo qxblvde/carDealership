@@ -1,6 +1,7 @@
 package ru.sivak.integration.rest.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.NullValueMappingStrategy;
 import ru.sivak.application.query.BodyQuery;
 import ru.sivak.application.query.BrandQuery;
 import ru.sivak.application.query.ColorQuery;
@@ -28,7 +29,7 @@ import ru.sivak.domain.valueObjects.TransmissionType;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 public interface ComponentQueryMapper {
 
     BodyQuery toBodyQuery(String type, String componentName, String modelName, BigDecimal minPrice, BigDecimal maxPrice);

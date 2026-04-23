@@ -18,6 +18,7 @@ import ru.sivak.domain.order.inStock.InStockOrder;
 import ru.sivak.domain.order.inStock.WaitingPaymentState;
 import ru.sivak.domain.repositories.*;
 import ru.sivak.domain.valueObjects.*;
+import ru.sivak.infrastructure.security.AuthenticatedUserService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class ApplicationOrderServicesTest {
@@ -37,15 +39,17 @@ class ApplicationOrderServicesTest {
         //Arrange
         CustomOrderRepository orderRepository = mock(CustomOrderRepository.class);
         CarRepository carRepository = mock(CarRepository.class);
-        CustomOrderService service = new CustomOrderService(orderRepository, carRepository, new OrderMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        CustomOrderService service = new CustomOrderService(orderRepository, carRepository, new OrderMapperImpl(), authenticatedUserService);
 
         Id managerId = Id.newId();
         Id clientId = Id.newId();
         Car car = car("Camry", "15000", models());
         when(carRepository.find(car.getId())).thenReturn(Optional.of(car));
+        when(authenticatedUserService.getCurrentUserId()).thenReturn(clientId);
 
         //Act
-        OrderDto created = service.create(managerId, clientId, car.getId());
+        OrderDto created = service.create(managerId, car.getId());
 
         //Assert
         assertEquals(clientId, created.clientId());
@@ -59,12 +63,12 @@ class ApplicationOrderServicesTest {
         //Arrange
         CustomOrderRepository orderRepository = mock(CustomOrderRepository.class);
         CarRepository carRepository = mock(CarRepository.class);
-        CustomOrderService service = new CustomOrderService(orderRepository, carRepository, new OrderMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        CustomOrderService service = new CustomOrderService(orderRepository, carRepository, new OrderMapperImpl(), authenticatedUserService);
 
         Id orderId = Id.newId();
         Id managerId = Id.newId();
         Id clientId = Id.newId();
-        Id newClientId = Id.newId();
         Car firstCar = car("Camry", "15000", models());
         Car secondCar = car("Corolla", "21000", models());
         CustomOrder order = new CustomOrder(orderId, managerId, clientId, firstCar);
@@ -73,10 +77,10 @@ class ApplicationOrderServicesTest {
         when(orderRepository.find(orderId)).thenReturn(Optional.of(order));
         when(carRepository.find(secondCar.getId())).thenReturn(Optional.of(secondCar));
 
-        OrderDto updated = service.update(orderId, newClientId, secondCar.getId());
+        OrderDto updated = service.update(orderId, secondCar.getId());
 
         //Assert
-        assertEquals(newClientId, updated.clientId());
+        assertEquals(clientId, updated.clientId());
         assertEquals(secondCar.getPrice(), updated.total());
         verify(orderRepository).update(order);
     }
@@ -86,11 +90,13 @@ class ApplicationOrderServicesTest {
         //Arrange
         CustomOrderRepository orderRepository = mock(CustomOrderRepository.class);
         CarRepository carRepository = mock(CarRepository.class);
-        CustomOrderService service = new CustomOrderService(orderRepository, carRepository, new OrderMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        CustomOrderService service = new CustomOrderService(orderRepository, carRepository, new OrderMapperImpl(), authenticatedUserService);
 
         Id managerId = Id.newId();
         Id clientId = Id.newId();
         CustomOrder order = new CustomOrder(Id.newId(), managerId, clientId, car("Camry", "15000", models()));
+        when(authenticatedUserService.hasRole(anyString())).thenReturn(true);
         when(orderRepository.query(any(CustomOrderQuery.class))).thenReturn(List.of(order));
 
         //Act
@@ -107,7 +113,8 @@ class ApplicationOrderServicesTest {
         //Arrange
         CustomOrderRepository orderRepository = mock(CustomOrderRepository.class);
         CarRepository carRepository = mock(CarRepository.class);
-        CustomOrderService service = new CustomOrderService(orderRepository, carRepository, new OrderMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        CustomOrderService service = new CustomOrderService(orderRepository, carRepository, new OrderMapperImpl(), authenticatedUserService);
 
         Id orderId = Id.newId();
         CustomOrder order = new CustomOrder(orderId, Id.newId(), Id.newId(), car("Camry", "15000", models()));
@@ -131,14 +138,15 @@ class ApplicationOrderServicesTest {
         //Arrange
         CustomOrderRepository orderRepository = mock(CustomOrderRepository.class);
         CarRepository carRepository = mock(CarRepository.class);
-        CustomOrderService service = new CustomOrderService(orderRepository, carRepository, new OrderMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        CustomOrderService service = new CustomOrderService(orderRepository, carRepository, new OrderMapperImpl(), authenticatedUserService);
 
         //Act
         when(carRepository.find(any(Id.class))).thenReturn(Optional.empty());
         when(orderRepository.find(any(Id.class))).thenReturn(Optional.empty());
 
         //Assert
-        assertThrows(IllegalArgumentException.class, () -> service.create(Id.newId(), Id.newId(), Id.newId()));
+        assertThrows(IllegalArgumentException.class, () -> service.create(Id.newId(), Id.newId()));
         assertThrows(IllegalArgumentException.class, () -> service.get(Id.newId()));
     }
 
@@ -147,7 +155,8 @@ class ApplicationOrderServicesTest {
         //Arrange
         CustomOrderRepository orderRepository = mock(CustomOrderRepository.class);
         CarRepository carRepository = mock(CarRepository.class);
-        CustomOrderService service = new CustomOrderService(orderRepository, carRepository, new OrderMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        CustomOrderService service = new CustomOrderService(orderRepository, carRepository, new OrderMapperImpl(), authenticatedUserService);
 
         Id orderId = Id.newId();
         CustomOrder order = new CustomOrder(orderId, Id.newId(), Id.newId(), car("Camry", "15000", models()));
@@ -165,15 +174,17 @@ class ApplicationOrderServicesTest {
         //Arrange
         InStockOrderRepository orderRepository = mock(InStockOrderRepository.class);
         CarRepository carRepository = mock(CarRepository.class);
-        InStockOrderService service = new InStockOrderService(orderRepository, carRepository, new OrderMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        InStockOrderService service = new InStockOrderService(orderRepository, carRepository, new OrderMapperImpl(), authenticatedUserService);
 
         Id managerId = Id.newId();
         Id clientId = Id.newId();
         Car car = car("Camry", "15000", models());
         when(carRepository.find(car.getId())).thenReturn(Optional.of(car));
+        when(authenticatedUserService.getCurrentUserId()).thenReturn(clientId);
 
         //Act
-        OrderDto created = service.create(managerId, clientId, car.getId());
+        OrderDto created = service.create(managerId, car.getId());
 
         //Assert
         assertEquals(clientId, created.clientId());
@@ -187,12 +198,12 @@ class ApplicationOrderServicesTest {
         //Arrange
         InStockOrderRepository orderRepository = mock(InStockOrderRepository.class);
         CarRepository carRepository = mock(CarRepository.class);
-        InStockOrderService service = new InStockOrderService(orderRepository, carRepository, new OrderMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        InStockOrderService service = new InStockOrderService(orderRepository, carRepository, new OrderMapperImpl(), authenticatedUserService);
 
         Id orderId = Id.newId();
         Id managerId = Id.newId();
         Id clientId = Id.newId();
-        Id newClientId = Id.newId();
         Car firstCar = car("Camry", "15000", models());
         Car secondCar = car("Corolla", "21000", models());
         InStockOrder order = new InStockOrder(orderId, managerId, clientId, firstCar);
@@ -201,10 +212,10 @@ class ApplicationOrderServicesTest {
         when(orderRepository.find(orderId)).thenReturn(Optional.of(order));
         when(carRepository.find(secondCar.getId())).thenReturn(Optional.of(secondCar));
 
-        OrderDto updated = service.update(orderId, newClientId, secondCar.getId());
+        OrderDto updated = service.update(orderId, secondCar.getId());
 
         //Assert
-        assertEquals(newClientId, updated.clientId());
+        assertEquals(clientId, updated.clientId());
         assertEquals(secondCar.getPrice(), updated.total());
         verify(orderRepository).update(order);
     }
@@ -214,7 +225,8 @@ class ApplicationOrderServicesTest {
         //Arrange
         InStockOrderRepository orderRepository = mock(InStockOrderRepository.class);
         CarRepository carRepository = mock(CarRepository.class);
-        InStockOrderService service = new InStockOrderService(orderRepository, carRepository, new OrderMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        InStockOrderService service = new InStockOrderService(orderRepository, carRepository, new OrderMapperImpl(), authenticatedUserService);
 
         Id managerId = Id.newId();
         Id clientId = Id.newId();
@@ -222,6 +234,7 @@ class ApplicationOrderServicesTest {
         //Act
         order.approve();
         order.requestPayment();
+        when(authenticatedUserService.hasRole(anyString())).thenReturn(true);
         when(orderRepository.query(any(InStockOrderQuery.class))).thenReturn(List.of(order));
 
         List<OrderDto> result = service.query(
@@ -241,7 +254,8 @@ class ApplicationOrderServicesTest {
         //Arrange
         InStockOrderRepository orderRepository = mock(InStockOrderRepository.class);
         CarRepository carRepository = mock(CarRepository.class);
-        InStockOrderService service = new InStockOrderService(orderRepository, carRepository, new OrderMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        InStockOrderService service = new InStockOrderService(orderRepository, carRepository, new OrderMapperImpl(), authenticatedUserService);
 
         Id orderId = Id.newId();
         InStockOrder order = new InStockOrder(orderId, Id.newId(), Id.newId(), car("Camry", "15000", models()));
@@ -264,14 +278,15 @@ class ApplicationOrderServicesTest {
         //Arrange
         InStockOrderRepository orderRepository = mock(InStockOrderRepository.class);
         CarRepository carRepository = mock(CarRepository.class);
-        InStockOrderService service = new InStockOrderService(orderRepository, carRepository, new OrderMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        InStockOrderService service = new InStockOrderService(orderRepository, carRepository, new OrderMapperImpl(), authenticatedUserService);
 
         //Act
         when(carRepository.find(any(Id.class))).thenReturn(Optional.empty());
         when(orderRepository.find(any(Id.class))).thenReturn(Optional.empty());
 
         //Assert
-        assertThrows(IllegalArgumentException.class, () -> service.create(Id.newId(), Id.newId(), Id.newId()));
+        assertThrows(IllegalArgumentException.class, () -> service.create(Id.newId(), Id.newId()));
         assertThrows(IllegalArgumentException.class, () -> service.get(Id.newId()));
     }
 
@@ -279,7 +294,8 @@ class ApplicationOrderServicesTest {
     void test_drive_request_service_creates_updates_and_gets_request() {
         //Arrange
         TestDriveRequestRepository repository = mock(TestDriveRequestRepository.class);
-        TestDriveRequestService service = new TestDriveRequestService(repository, new TestDriveMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        TestDriveRequestService service = new TestDriveRequestService(repository, new TestDriveMapperImpl(), authenticatedUserService);
 
         Id requestId = Id.newId();
         Id clientId = Id.newId();
@@ -287,6 +303,9 @@ class ApplicationOrderServicesTest {
         LocalDate date = LocalDate.of(2026, 3, 25);
 
         //Act
+        when(authenticatedUserService.getCurrentUserId()).thenReturn(clientId);
+        service.create(carId, date);
+
         TestDriveRequest request = TestDriveRequest.builder()
                 .id(requestId)
                 .clientId(clientId)
@@ -296,11 +315,12 @@ class ApplicationOrderServicesTest {
 
         when(repository.find(requestId)).thenReturn(Optional.of(request), Optional.of(request));
 
-        service.update(requestId, Id.newId(), Id.newId(), LocalDate.of(2026, 3, 26));
+        service.update(requestId, Id.newId(), LocalDate.of(2026, 3, 26));
         Id actualId = service.get(requestId).id();
 
         //Assert
         assertEquals(requestId, actualId);
+        verify(repository).create(any(TestDriveRequest.class));
         verify(repository).update(request);
     }
 
@@ -308,7 +328,8 @@ class ApplicationOrderServicesTest {
     void test_drive_request_service_queries_and_deletes_request() {
         //Arrange
         TestDriveRequestRepository repository = mock(TestDriveRequestRepository.class);
-        TestDriveRequestService service = new TestDriveRequestService(repository, new TestDriveMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        TestDriveRequestService service = new TestDriveRequestService(repository, new TestDriveMapperImpl(), authenticatedUserService);
 
         Id requestId = Id.newId();
         TestDriveRequest request = TestDriveRequest.builder()
@@ -318,6 +339,7 @@ class ApplicationOrderServicesTest {
                 .scheduledTime(LocalDate.of(2026, 3, 25))
                 .build();
 
+        when(authenticatedUserService.hasRole(anyString())).thenReturn(true);
         when(repository.query(any(TestDriveRequestQuery.class))).thenReturn(List.of(request));
 
         //Act
@@ -333,14 +355,15 @@ class ApplicationOrderServicesTest {
     void test_drive_request_service_throws_for_missing_request() {
         //Arrange
         TestDriveRequestRepository repository = mock(TestDriveRequestRepository.class);
-        TestDriveRequestService service = new TestDriveRequestService(repository, new TestDriveMapperImpl());
+        AuthenticatedUserService authenticatedUserService = mock(AuthenticatedUserService.class);
+        TestDriveRequestService service = new TestDriveRequestService(repository, new TestDriveMapperImpl(), authenticatedUserService);
 
         //Act
         when(repository.find(any(Id.class))).thenReturn(Optional.empty());
 
         //Assert
         assertThrows(IllegalArgumentException.class, () -> service.get(Id.newId()));
-        assertThrows(IllegalArgumentException.class, () -> service.update(Id.newId(), Id.newId(), Id.newId(), LocalDate.of(2026, 3, 26)));
+        assertThrows(IllegalArgumentException.class, () -> service.update(Id.newId(), Id.newId(), LocalDate.of(2026, 3, 26)));
     }
 
     private static Set<ModelName> models() {

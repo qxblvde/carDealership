@@ -5,8 +5,9 @@ import lombok.Getter;
 import ru.sivak.domain.order.inStock.InStockOrderState;
 import ru.sivak.domain.valueObjects.Id;
 import ru.sivak.domain.valueObjects.Money;
+
 @Getter
-@Builder
+@Builder(toBuilder = true)
 public class InStockOrderQuery {
     private final Id clientId;
     private final Id managerId;

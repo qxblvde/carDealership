@@ -8,9 +8,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ITestDriveRequestService {
-    TestDriveRequestDto create(Id clientId, Id carId, LocalDate scheduledTime);
+    TestDriveRequestDto create(Id carId, LocalDate scheduledTime);
+
     List<TestDriveRequestDto> query(TestDriveRequestQuery query);
+
     void delete(Id id);
+
     TestDriveRequestDto get(Id id);
-    TestDriveRequestDto update(Id requestId, Id newClientId, Id newCarId, LocalDate newTime);
+
+    TestDriveRequestDto update(Id requestId, Id newCarId, LocalDate newTime);
 }

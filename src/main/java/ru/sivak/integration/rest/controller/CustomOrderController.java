@@ -23,7 +23,7 @@ public class CustomOrderController {
     @PostMapping
     public OrderDto create(@RequestBody CreateOrderRequest request) {
         CustomOrderRequestMapper.CreateCommand command = customOrderRequestMapper.toCreateCommand(request);
-        return customOrderService.create(command.managerId(), command.clientId(), command.carId());
+        return customOrderService.create(command.managerId(), command.carId());
     }
 
     @GetMapping
@@ -45,7 +45,7 @@ public class CustomOrderController {
     @PutMapping("/{id}")
     public OrderDto update(@PathVariable UUID id, @RequestBody UpdateOrderRequest request) {
         CustomOrderRequestMapper.UpdateCommand command = customOrderRequestMapper.toUpdateCommand(id, request);
-        return customOrderService.update(command.orderId(), command.clientId(), command.carId());
+        return customOrderService.update(command.orderId(), command.carId());
     }
 
     @PostMapping("/{id}/approve")

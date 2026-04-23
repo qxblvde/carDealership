@@ -1,7 +1,9 @@
 package ru.sivak.integration.rest.mapper;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValueMappingStrategy;
 import ru.sivak.application.query.CustomOrderQuery;
 import ru.sivak.domain.order.custom.CustomOrderState;
 import ru.sivak.domain.valueObjects.Id;
@@ -16,12 +18,10 @@ import java.util.UUID;
 public interface CustomOrderRequestMapper {
 
     @Mapping(target = "managerId", source = "request.managerId")
-    @Mapping(target = "clientId", source = "request.clientId")
     @Mapping(target = "carId", source = "request.carId")
     CreateCommand toCreateCommand(CreateOrderRequest request);
 
     @Mapping(target = "orderId", source = "orderId")
-    @Mapping(target = "clientId", source = "request.clientId")
     @Mapping(target = "carId", source = "request.carId")
     UpdateCommand toUpdateCommand(UUID orderId, UpdateOrderRequest request);
 
@@ -30,6 +30,7 @@ public interface CustomOrderRequestMapper {
     @Mapping(target = "stateType", source = "state")
     @Mapping(target = "minPrice", source = "minPrice")
     @Mapping(target = "maxPrice", source = "maxPrice")
+    @BeanMapping(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
     CustomOrderQuery toQuery(UUID clientId, UUID managerId, String state, BigDecimal minPrice, BigDecimal maxPrice);
 
     default Id toId(UUID value) {
@@ -44,9 +45,9 @@ public interface CustomOrderRequestMapper {
         return OrderStateMapper.parseCustomState(value);
     }
 
-    record CreateCommand(Id managerId, Id clientId, Id carId) {
+    record CreateCommand(Id managerId, Id carId) {
     }
 
-    record UpdateCommand(Id orderId, Id clientId, Id carId) {
+    record UpdateCommand(Id orderId, Id carId) {
     }
 }

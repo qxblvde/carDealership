@@ -14,7 +14,12 @@ spring:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8081/realms/cars/protocol/openid-connect/certs
+
   test:
     database:
       replace: none
-
