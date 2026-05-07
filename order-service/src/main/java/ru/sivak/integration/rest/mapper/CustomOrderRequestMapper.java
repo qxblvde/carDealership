@@ -23,7 +23,6 @@ public interface CustomOrderRequestMapper {
     CreateCommand toCreateCommand(CreateOrderRequest request);
 
     @Mapping(target = "orderId", source = "orderId")
-    @Mapping(target = "clientId", source = "request.clientId")
     @Mapping(target = "carId", source = "request.carId")
     @Mapping(target = "price", source = "request.price")
     UpdateCommand toUpdateCommand(UUID orderId, UpdateOrderRequest request);

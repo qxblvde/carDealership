@@ -10,4 +10,3 @@ public record CreateTestDriveRequest(
         @NotNull LocalDate scheduledTime
 ) {
 }
-

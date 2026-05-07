@@ -13,6 +13,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class AppUserEntity extends BaseJpaEntity {
+    @Column(name = "username", nullable = false, length = 128, unique = true)
+    private String username;
+
     @Column(name = "user_role", nullable = false, length = 64)
     private String userRole;
 }

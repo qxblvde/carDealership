@@ -31,10 +31,11 @@ public class TestDriveRequestService implements ITestDriveRequestService {
         Id clientId = authenticatedUserService.getCurrentUserId();
         TestDriveRequest request = TestDriveRequest.builder()
                 .id(Id.newId())
-                .clientId(clientId)
+                .clientId(authenticatedUserService.getCurrentUserId())
                 .carId(carId)
                 .scheduledTime(scheduledTime)
                 .build();
+
         repository.create(request);
         return testDriveMapper.map(request);
     }
@@ -70,7 +71,6 @@ public class TestDriveRequestService implements ITestDriveRequestService {
         TestDriveRequest request = repository.find(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found"));
 
-        request.updateClient(newClientId);
         request.updateCar(newCarId);
         request.updateScheduledTime(newTime);
 

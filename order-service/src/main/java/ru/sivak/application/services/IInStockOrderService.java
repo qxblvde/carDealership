@@ -11,14 +11,21 @@ import java.util.List;
 public interface IInStockOrderService {
     OrderDto create(Id managerId, Id carId, Money price);
     List<OrderDto> query(InStockOrderQuery query);
+
     void approve(Id orderId);
+
     void requestPayment(Id orderId);
+
     void pay(Id orderId);
+
     void complete(Id orderId);
+
     void cancel(Id orderId);
+
     void markAsReady(Id orderId);
 
     InStockOrder get(Id id);
+
     OrderDto getDto(Id id);
     OrderDto update(Id orderId, Id newClientId, Id newCarId, Money newPrice);
 }

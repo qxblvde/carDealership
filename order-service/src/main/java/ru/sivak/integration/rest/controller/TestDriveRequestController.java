@@ -44,7 +44,7 @@ public class TestDriveRequestController {
     @PutMapping("/{id}")
     public TestDriveRequestDto update(@PathVariable UUID id, @RequestBody UpdateTestDriveRequest request) {
         TestDriveRequestRestMapper.UpdateCommand command = testDriveRequestRestMapper.toUpdateCommand(id, request);
-        return testDriveRequestService.update(command.requestId(), command.clientId(), command.carId(), command.scheduledTime());
+        return testDriveRequestService.update(command.requestId(), command.carId(), command.scheduledTime());
     }
 
     @DeleteMapping("/{id}")

@@ -20,7 +20,6 @@ public interface TestDriveRequestRestMapper {
     CreateCommand toCreateCommand(CreateTestDriveRequest request);
 
     @Mapping(target = "requestId", source = "requestId")
-    @Mapping(target = "clientId", source = "request.clientId")
     @Mapping(target = "carId", source = "request.carId")
     @Mapping(target = "scheduledTime", source = "request.scheduledTime")
     UpdateCommand toUpdateCommand(UUID requestId, UpdateTestDriveRequest request);
@@ -39,6 +38,6 @@ public interface TestDriveRequestRestMapper {
     record CreateCommand(Id carId, LocalDate scheduledTime) {
     }
 
-    record UpdateCommand(Id requestId, Id clientId, Id carId, LocalDate scheduledTime) {
+    record UpdateCommand(Id requestId, Id carId, LocalDate scheduledTime) {
     }
 }
