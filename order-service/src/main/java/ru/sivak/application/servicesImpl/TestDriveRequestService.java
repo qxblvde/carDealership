@@ -31,7 +31,7 @@ public class TestDriveRequestService implements ITestDriveRequestService {
         Id clientId = authenticatedUserService.getCurrentUserId();
         TestDriveRequest request = TestDriveRequest.builder()
                 .id(Id.newId())
-                .clientId(authenticatedUserService.getCurrentUserId())
+                .clientId(clientId)
                 .carId(carId)
                 .scheduledTime(scheduledTime)
                 .build();
@@ -67,7 +67,7 @@ public class TestDriveRequestService implements ITestDriveRequestService {
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or @orderAccessChecker.isCurrentTestDriveOwner(#requestId)")
-    public TestDriveRequestDto update(@NonNull Id requestId, @NonNull Id newClientId, @NonNull Id newCarId, @NonNull LocalDate newTime) {
+    public TestDriveRequestDto update(@NonNull Id requestId, @NonNull Id newCarId, @NonNull LocalDate newTime) {
         TestDriveRequest request = repository.find(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found"));
 
