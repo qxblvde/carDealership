@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-schema
+      author: maxim sivak
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/001-create-schema.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: true
+
+  - changeSet:
+      id: 002-seed-data
+      author: maxim sivak
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/002-seed-data.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: true
+
+  - changeSet:
+      id: 003-keycloak-security-users
+      author: maxim sivak
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/003-keycloak-security-users.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: true
+
+  - changeSet:
+      id: 004-outbox-event
+      author: maxim sivak
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/004-outbox-event.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: true

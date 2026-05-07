@@ -1,18 +1,68 @@
 services:
-  postgres:
+  order-db:
     image: postgres:16-alpine
-    container_name: ru-sivak-postgres
+    container_name: ru-sivak-order-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: car_dealership
+      POSTGRES_DB: order_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data  
+      - order_db_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d car_dealership" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d order_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  storage-db:
+    image: postgres:16-alpine
+    container_name: ru-sivak-storage-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: storage_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - storage_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d storage_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.3.2
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HTTP_ENABLED=true
+      - KC_HOSTNAME_STRICT=false
+    ports:
+      - "8180:8080"
+    restart: always
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: ru-sivak-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,4 +76,7 @@ services:
       - "8081:8080"
     restart: always
 volumes:
-  postgres_data:
+  order_db_data:
+  storage_db_data:
+  rabbitmq_data:
+  keycloak_data:

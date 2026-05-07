@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-schema
+      author: maxim sivak
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/001-create-schema.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: true
+
+  - changeSet:
+      id: 002-seed-data
+      author: maxim sivak
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/002-seed-data.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: true
+
+  - changeSet:
+      id: 003-assembly-order
+      author: maxim sivak
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/003-assembly-order.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: true
+
+  - changeSet:
+      id: 004-stock
+      author: maxim sivak
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/004-stock.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: true
+
+  - changeSet:
+      id: 005-stock-seed
+      author: maxim sivak
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/005-stock-seed.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: true
