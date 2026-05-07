@@ -1,0 +1,17 @@
+package ru.sivak.integration.messaging.event;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.UUID;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderApprovedEvent implements DomainEvent {
+    private UUID orderId;
+    private String traceId;
+}

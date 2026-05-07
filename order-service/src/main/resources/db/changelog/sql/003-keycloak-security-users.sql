@@ -1,0 +1,25 @@
+ALTER TABLE app_users
+    ADD COLUMN username VARCHAR(128);
+
+UPDATE app_users
+SET username = CASE id
+    WHEN '00000000-0000-0000-0000-000000000001' THEN 'manager1'
+    WHEN '00000000-0000-0000-0000-000000000002' THEN 'user1'
+    WHEN '00000000-0000-0000-0000-000000000003' THEN 'warehouse1'
+    WHEN '00000000-0000-0000-0000-000000000004' THEN 'admin1'
+    ELSE username
+END;
+
+UPDATE app_users
+SET user_role = CASE user_role
+    WHEN 'CLIENT' THEN 'USER'
+    WHEN 'STORAGE_ADMIN' THEN 'WAREHOUSE_ADMIN'
+    WHEN 'SYSTEM_ADMIN' THEN 'ADMIN'
+    ELSE user_role
+END;
+
+ALTER TABLE app_users
+    ALTER COLUMN username SET NOT NULL;
+
+ALTER TABLE app_users
+    ADD CONSTRAINT uk_app_users_username UNIQUE (username);
