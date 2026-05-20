@@ -5,6 +5,9 @@ COPY gradlew gradlew
 COPY gradle gradle
 COPY build.gradle.kts build.gradle.kts
 COPY settings.gradle.kts settings.gradle.kts
+COPY available-car-contract/build.gradle.kts available-car-contract/build.gradle.kts
+COPY available-car-contract/src available-car-contract/src
+COPY order-service/build.gradle.kts order-service/build.gradle.kts
 COPY storage-service/build.gradle.kts storage-service/build.gradle.kts
 COPY storage-service/src storage-service/src
 
@@ -17,4 +20,5 @@ WORKDIR /app
 COPY --from=builder /app/storage-service/build/libs/*.jar app.jar
 
 EXPOSE 8081
+EXPOSE 9091
 ENTRYPOINT ["java", "-jar", "app.jar"]

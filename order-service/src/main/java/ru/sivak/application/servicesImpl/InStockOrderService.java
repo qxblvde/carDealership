@@ -37,7 +37,7 @@ public class InStockOrderService implements IInStockOrderService {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public OrderDto create(@NonNull Id managerId, @NonNull Id carId, @NonNull Money price) {
         Id clientId = authenticatedUserService.getCurrentUserId();
-        InStockOrder order = new InStockOrder(Id.newId(), clientId, managerId, carId, price);
+        InStockOrder order = new InStockOrder(Id.newId(), managerId, clientId, carId, price);
         inStockOrderRepository.create(order);
         return orderMapper.map(order);
     }

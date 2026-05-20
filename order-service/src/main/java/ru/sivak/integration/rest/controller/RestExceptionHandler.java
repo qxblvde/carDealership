@@ -1,5 +1,7 @@
 package ru.sivak.integration.rest.controller;
 
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -49,8 +51,29 @@ public class RestExceptionHandler {
         );
     }
 
+    @ExceptionHandler(StatusRuntimeException.class)
+    public ResponseEntity<ApiErrorResponse> handleGrpc(StatusRuntimeException exception) {
+        HttpStatus status = mapGrpcStatus(exception.getStatus().getCode());
+        return ResponseEntity.status(status).body(
+                new ApiErrorResponse(resolveGrpcMessage(exception), status.value(), Instant.now())
+        );
+    }
+
     private boolean isNotFound(IllegalArgumentException exception) {
         String message = exception.getMessage();
         return message != null && message.toLowerCase().contains("not found");
+    }
+
+    private HttpStatus mapGrpcStatus(Status.Code code) {
+        return switch (code) {
+            case NOT_FOUND -> HttpStatus.NOT_FOUND;
+            case INVALID_ARGUMENT -> HttpStatus.BAD_REQUEST;
+            default -> HttpStatus.SERVICE_UNAVAILABLE;
+        };
+    }
+
+    private String resolveGrpcMessage(StatusRuntimeException exception) {
+        String description = exception.getStatus().getDescription();
+        return description == null ? "StorageService is unavailable" : description;
     }
 }
