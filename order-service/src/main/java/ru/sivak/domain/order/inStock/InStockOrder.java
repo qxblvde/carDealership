@@ -8,8 +8,8 @@ import ru.sivak.domain.valueObjects.Money;
 public class InStockOrder extends BaseOrder {
     private InStockOrderState state;
 
-    public InStockOrder(@NonNull Id id, @NonNull Id clientId, @NonNull Id managerId, @NonNull Id carId, @NonNull Money price) {
-        super(id, clientId, managerId, carId, price);
+    public InStockOrder(@NonNull Id id, @NonNull Id managerId, @NonNull Id clientId, @NonNull Id carId, @NonNull Money price) {
+        super(id, managerId, clientId, carId, price);
         this.state = new CreatedState();
     }
 

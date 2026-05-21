@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package availablecar;
+
+option java_multiple_files = true;
+option java_outer_classname = "AvailableCarProto";
+option java_package = "ru.sivak.contract.availablecar";
+
+service AvailableCarService {
+  rpc GetAvailableCars(GetAvailableCarsRequest) returns (GetAvailableCarsResponse);
+  rpc GetAvailableCarById(GetAvailableCarByIdRequest) returns (AvailableCarResponse);
+}
+
+message GetAvailableCarsRequest {
+}
+
+message GetAvailableCarByIdRequest {
+  string id = 1;
+}
+
+message GetAvailableCarsResponse {
+  repeated AvailableCarResponse cars = 1;
+}
+
+message AvailableCarResponse {
+  string id = 1;
+  string body_type = 2;
+  string brand_name = 3;
+  string color = 4;
+  string drive_type = 5;
+  int32 engine_power = 6;
+  int32 engine_volume = 7;
+  string fuel_type = 8;
+  string model_name = 9;
+  string price = 10;
+  string transmission_type = 11;
+  int32 available_quantity = 12;
+}

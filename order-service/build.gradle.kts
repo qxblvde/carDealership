@@ -12,6 +12,8 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":available-car-contract"))
+    implementation(platform("io.grpc:grpc-bom:1.64.0"))
     implementation("org.springframework.boot:spring-boot-starter-amqp")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -22,6 +24,7 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.6.3")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("io.grpc:grpc-netty-shaded")
     runtimeOnly("org.postgresql:postgresql")
 
     compileOnly("org.projectlombok:lombok:1.18.42")

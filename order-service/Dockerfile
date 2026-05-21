@@ -5,8 +5,11 @@ COPY gradlew gradlew
 COPY gradle gradle
 COPY build.gradle.kts build.gradle.kts
 COPY settings.gradle.kts settings.gradle.kts
+COPY available-car-contract/build.gradle.kts available-car-contract/build.gradle.kts
+COPY available-car-contract/src available-car-contract/src
 COPY order-service/build.gradle.kts order-service/build.gradle.kts
 COPY order-service/src order-service/src
+COPY storage-service/build.gradle.kts storage-service/build.gradle.kts
 
 RUN chmod +x gradlew
 RUN ./gradlew --no-daemon :order-service:bootJar -x test

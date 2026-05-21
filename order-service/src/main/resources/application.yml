@@ -38,3 +38,9 @@ server:
 outbox:
   publisher:
     delay-ms: ${OUTBOX_PUBLISHER_DELAY_MS:5000}
+
+storage:
+  grpc:
+    host: ${STORAGE_GRPC_HOST:localhost}
+    port: ${STORAGE_GRPC_PORT:9091}
+    timeout-ms: ${STORAGE_GRPC_TIMEOUT_MS:1000}
